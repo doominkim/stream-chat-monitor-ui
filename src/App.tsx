@@ -6,9 +6,8 @@ import {
 } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import UserList from "./pages/UserList";
-import UserDetail from "./pages/UserDetail";
 import SearchUser from "./pages/SearchUser";
+import UserDetail from "./pages/UserDetail";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import "./App.css";
@@ -22,9 +21,8 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/users" element={<UserList />} />
-            <Route path="/users/:id" element={<UserDetail />} />
             <Route path="/search" element={<SearchUser />} />
+            <Route path="/user/:userId" element={<UserDetail />} />
             <Route path="/" element={<Navigate to="/search" replace />} />
           </Routes>
         </main>

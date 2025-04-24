@@ -13,13 +13,7 @@ const SearchUser = () => {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value.length > 3) {
-      const maskedValue = value.slice(0, 3) + "*".repeat(value.length - 3);
-      setUserId(maskedValue);
-    } else {
-      setUserId(value);
-    }
+    setUserId(e.target.value);
   };
 
   return (

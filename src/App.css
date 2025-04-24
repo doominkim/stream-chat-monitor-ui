@@ -226,11 +226,29 @@ main {
   padding: 0.5rem;
   width: 100%;
   margin-top: 3.5rem;
-  margin-bottom: 4rem;
-  overflow: hidden;
-  min-height: calc(100vh - 7.5rem);
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: calc(100vh - 3.5rem);
   display: flex;
   flex-direction: column;
+}
+
+main::-webkit-scrollbar {
+  width: 8px;
+}
+
+main::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+main::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+main::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
 }
 
 /* Section styles */
@@ -344,6 +362,11 @@ footer {
   height: 4rem;
 }
 
+/* Hide footer on UserDetail page */
+body.hide-footer footer {
+  display: none;
+}
+
 footer .footer-content {
   max-width: 960px;
   margin: 0 auto;
@@ -379,27 +402,28 @@ footer .footer-content {
   flex: 1;
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem 0;
   width: 100%;
   display: flex;
   flex-direction: column;
+  background-color: var(--bg-secondary);
 }
 
 .user-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
+  flex-direction: column;
+  gap: 1rem;
   padding: 1.5rem;
   background-color: var(--bg-primary);
   border-radius: 0.75rem;
   border: 1px solid var(--border-color);
+  margin-bottom: 1rem;
 }
 
 .user-info {
   display: flex;
-  align-items: center;
   gap: 1rem;
+  align-items: flex-start;
 }
 
 .user-avatar {
@@ -415,10 +439,132 @@ footer .footer-content {
   font-weight: bold;
 }
 
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .user-name {
   font-size: 1.5rem;
-  font-weight: bold;
+  font-weight: 600;
   color: var(--text-primary);
+}
+
+.user-stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.user-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: var(--bg-primary);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.stat-value {
+  font-size: 1rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.favorite-games {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: var(--bg-primary);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+}
+
+.favorite-games-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.favorite-games-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.favorite-games-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.favorite-game {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background-color: var(--bg-primary);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.favorite-game-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.favorite-game-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.favorite-game-name {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.favorite-game-time {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.chat-card {
+  background-color: var(--bg-primary);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 1000px;
+}
+
+.chat-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.chat-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
 }
 
 .chat-list {
@@ -426,27 +572,87 @@ footer .footer-content {
   flex-direction: column;
   gap: 1rem;
   flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  height: 1000px;
+}
+
+.chat-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-list::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.chat-list::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.chat-list::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
 }
 
 .chat-item {
   background-color: var(--bg-primary);
-  border-radius: 0.75rem;
-  padding: 1.5rem;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
   border: 1px solid var(--border-color);
+  max-width: 80%;
+  margin-bottom: 0.5rem;
+}
+
+.chat-item.streamer {
+  margin-right: auto;
+  background-color: var(--card-bg);
+}
+
+.chat-item.user {
+  margin-left: auto;
+  background-color: var(--bg-primary);
+}
+
+.chat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .chat-message {
   color: var(--text-primary);
-  margin-bottom: 1rem;
-  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
 }
 
 .chat-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
+  gap: 0.5rem;
+}
+
+.audio-button {
+  background-color: var(--primary-color);
+  color: var(--bg-primary);
+  border: none;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.audio-button:hover {
+  background-color: var(--primary-hover);
+}
+
+.audio-button.playing {
+  background-color: var(--primary-hover);
 }
 
 .timestamp {
@@ -454,8 +660,8 @@ footer .footer-content {
 }
 
 .sentiment {
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.75rem;
   font-weight: 500;
 }
 
@@ -479,6 +685,13 @@ footer .footer-content {
   padding: 2rem;
   font-size: 1.1rem;
   color: var(--text-primary);
+}
+
+.loading-more {
+  text-align: center;
+  padding: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
 }
 
 /* Camera icon styles */
@@ -620,4 +833,330 @@ footer .footer-content {
 .dropdown-item:hover {
   background-color: var(--border-color);
   color: var(--primary-color);
+}
+
+.game-icon {
+  margin-bottom: 0.5rem;
+}
+
+.game-icon-image {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.user-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge.early_supporter {
+  background-color: rgba(0, 255, 163, 0.1);
+  color: var(--primary-color);
+}
+
+.badge.chat_enthusiast {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+}
+
+.badge.gift_giver {
+  background-color: rgba(255, 87, 34, 0.1);
+  color: #ff5722;
+}
+
+.active-time {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--text-secondary);
+}
+
+.active-time::before {
+  content: "🕒";
+  font-size: 0.875rem;
+}
+
+.back-button {
+  margin-bottom: 1rem;
+  align-self: flex-start;
+}
+
+.user-detail-page {
+  padding: 0 1rem;
+  height: calc(100vh - 3.5rem);
+  overflow-y: auto;
+}
+
+.user-detail-page::-webkit-scrollbar {
+  width: 8px;
+}
+
+.user-detail-page::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.user-detail-page::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.user-detail-page::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+.analysis-card {
+  background-color: var(--bg-primary);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.analysis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.analysis-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.toxicity-score {
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.toxicity-score.good {
+  background-color: rgba(0, 255, 163, 0.1);
+  color: var(--primary-color);
+}
+
+.toxicity-score.warning {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+}
+
+.toxicity-score.danger {
+  background-color: rgba(255, 87, 34, 0.1);
+  color: #ff5722;
+}
+
+.analysis-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.analysis-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.analysis-subtitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.analysis-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.analysis-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background-color: var(--bg-secondary);
+  border-radius: 0.5rem;
+}
+
+.analysis-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.analysis-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.warning-list .analysis-list-item::before {
+  content: "⚠️";
+}
+
+.positive-list .analysis-list-item::before {
+  content: "✨";
+}
+
+.personality-card {
+  background-color: var(--bg-primary);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.personality-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.personality-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.personality-type {
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background-color: rgba(0, 255, 163, 0.1);
+  color: var(--primary-color);
+}
+
+.personality-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+.personality-traits {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.trait-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.trait-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.trait-icon {
+  font-size: 1.25rem;
+}
+
+.trait-name {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.trait-bar-container {
+  position: relative;
+  height: 0.5rem;
+  background-color: var(--bg-secondary);
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.trait-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background-color: var(--primary-color);
+  border-radius: 0.25rem;
+  transition: width 0.3s ease;
+}
+
+.trait-value {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.personality-section {
+  margin-top: 1.5rem;
+}
+
+.personality-subtitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.characteristics-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.characteristic-item {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.characteristic-item::before {
+  content: "•";
+  position: absolute;
+  left: 0.5rem;
+  color: var(--primary-color);
+}
+
+.matching-streamers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.matching-streamer {
+  padding: 0.25rem 0.75rem;
+  background-color: var(--bg-secondary);
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
 }

@@ -1,0 +1,111 @@
+.user-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  background-color: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.user-name {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.chat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chat-item {
+  background-color: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chat-message {
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.chat-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #666;
+}
+
+.sentiment {
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.sentiment.positive {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.sentiment.negative {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.sentiment.neutral {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.button-secondary {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.button-secondary:hover {
+  background-color: #d1d5db;
+}
