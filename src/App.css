@@ -1160,3 +1160,13 @@ footer .footer-content {
   font-size: 0.875rem;
   color: var(--text-primary);
 }
+
+body.hide-header-footer header,
+body.hide-header-footer footer {
+  display: none;
+}
+
+body.hide-header-footer main {
+  margin-top: 0;
+  height: 100vh;
+}

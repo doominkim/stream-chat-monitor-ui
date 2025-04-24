@@ -179,6 +179,8 @@ const UserDetail = () => {
     },
   });
 
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
   useEffect(() => {
     // 초기 데이터 로드
     setChatHistory(generateMockData(50));
@@ -192,6 +194,23 @@ const UserDetail = () => {
       document.body.classList.remove("hide-footer");
     };
   }, [userId]);
+
+  useEffect(() => {
+    const handleScroll = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (target.scrollTop > 300) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+
+    const pageElement = document.querySelector(".user-detail-page");
+    if (pageElement) {
+      pageElement.addEventListener("scroll", handleScroll);
+      return () => pageElement.removeEventListener("scroll", handleScroll);
+    }
+  }, []);
 
   const loadMore = () => {
     if (!hasMore) return;
@@ -224,6 +243,20 @@ const UserDetail = () => {
     }
   };
 
+  const scrollToTop = () => {
+    const pageElement = document.querySelector(".user-detail-page");
+    if (pageElement) {
+      pageElement.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const handleChatToggle = () => {
+    window.open(`/user/${userId}/chat`, "_blank", "width=800,height=600");
+  };
+
   if (loading) {
     return (
       <main className="user-detail-page">
@@ -242,6 +275,12 @@ const UserDetail = () => {
           onClick={() => navigate("/search")}
         >
           돌아가기
+        </button>
+        <button
+          className="button button-secondary chat-toggle-button"
+          onClick={handleChatToggle}
+        >
+          💬 채팅보기
         </button>
         <div className="user-header">
           <div className="user-info">
@@ -421,54 +460,13 @@ const UserDetail = () => {
             ))}
           </div>
         </div>
-        <div className="chat-card">
-          <div className="chat-header">
-            <h2 className="chat-title">채팅 기록</h2>
-          </div>
-          <div className="chat-list" onScroll={handleScroll}>
-            {chatHistory.map((message) => (
-              <div
-                key={message.id}
-                className={`chat-item ${
-                  message.isStreamer ? "streamer" : "user"
-                }`}
-              >
-                <div className="chat-content">
-                  {message.isStreamer && message.game && (
-                    <div className="game-icon">
-                      <img
-                        src={`/game-icons/${message.game}.png`}
-                        alt={message.game}
-                        className="game-icon-image"
-                      />
-                    </div>
-                  )}
-                  <div className="chat-message">{message.content}</div>
-                  <div className="chat-meta">
-                    <span className="timestamp">{message.timestamp}</span>
-                    {message.isStreamer && message.audioUrl && (
-                      <button
-                        className={`audio-button ${
-                          playingAudio === message.audioUrl ? "playing" : ""
-                        }`}
-                        onClick={() => handlePlayAudio(message.audioUrl!)}
-                      >
-                        {playingAudio === message.audioUrl ? "정지" : "재생"}
-                      </button>
-                    )}
-                    <span className={`sentiment ${message.sentiment}`}>
-                      {message.sentiment === "positive" && "긍정적"}
-                      {message.sentiment === "negative" && "부정적"}
-                      {message.sentiment === "neutral" && "중립적"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-            {hasMore && <div className="loading-more">더 불러오는 중...</div>}
-          </div>
-        </div>
       </div>
+      <button
+        className={`scroll-to-top ${showScrollTop ? "visible" : ""}`}
+        onClick={scrollToTop}
+      >
+        ↑
+      </button>
     </main>
   );
 };
