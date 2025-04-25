@@ -353,3 +353,20 @@
     padding-bottom: 4rem;
   }
 }
+
+.chat-date-group {
+  margin-bottom: 16px;
+}
+
+.chat-date-header {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  backdrop-filter: blur(8px);
+}
