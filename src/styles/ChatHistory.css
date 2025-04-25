@@ -116,23 +116,22 @@
 }
 
 .chat-item {
-  margin-bottom: 16px;
-  padding: 12px;
-  border-radius: 8px;
-  background-color: var(--card-bg);
+  margin: 4px 0;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
-  max-width: 80%;
 }
 
 .chat-item.streamer {
-  background-color: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  margin-right: auto;
+  background-color: rgba(0, 255, 163, 0.1);
+  border: 1px solid rgba(0, 255, 163, 0.2);
 }
 
 .chat-item.user {
-  margin-left: auto;
-  background-color: var(--bg-secondary);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .chat-item.donation {
@@ -168,6 +167,58 @@
   max-width: 70%;
 }
 
+.chat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chat-user-id {
+  font-weight: bold;
+  color: #00ffa3;
+  font-size: 0.875rem;
+}
+
+.chat-message {
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.chat-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.timestamp {
+  color: var(--text-secondary);
+}
+
+.sentiment {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.sentiment.positive {
+  background-color: rgba(0, 255, 163, 0.1);
+  color: #00ffa3;
+}
+
+.sentiment.negative {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #ff0000;
+}
+
+.sentiment.neutral {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+}
+
 .donation-badge {
   position: absolute;
   top: 8px;
@@ -178,6 +229,7 @@
   color: var(--bg-primary);
   font-size: 0.75rem;
   font-weight: bold;
+  z-index: 1;
 }
 
 .subscription-badge {
@@ -188,8 +240,9 @@
   color: #000;
   padding: 4px 8px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: bold;
+  z-index: 1;
 }
 
 .ban-badge {
@@ -200,54 +253,31 @@
   color: #fff;
   padding: 4px 8px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: bold;
+  z-index: 1;
 }
 
 .donation-amount {
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: bold;
   color: var(--primary-color);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .subscription-months {
-  font-size: 24px;
+  font-size: 1rem;
   font-weight: bold;
   color: #ffd700;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
-.donation-message {
-  font-style: italic;
-  color: var(--text-primary);
-  margin-top: 8px;
-}
-
-.subscription-message {
-  font-style: italic;
-  color: #ffd700;
-  margin-top: 8px;
-}
-
-.ban-duration {
-  font-size: 24px;
-  font-weight: bold;
-  color: #ff0000;
-  margin-bottom: 8px;
-}
-
+.donation-message,
+.subscription-message,
 .ban-reason {
-  font-style: italic;
-  color: #ff0000;
-  margin-top: 8px;
-}
-
-.chat-content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-width: 100%;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
 }
 
 .game-icon {
@@ -255,7 +285,7 @@
   height: 24px;
   border-radius: 4px;
   overflow: hidden;
-  flex-shrink: 0;
+  margin-bottom: 4px;
 }
 
 .game-icon-image {
@@ -264,21 +294,25 @@
   object-fit: cover;
 }
 
-.chat-message {
-  color: var(--text-primary);
-  font-size: 0.875rem;
-  line-height: 1.5;
-  word-break: break-word;
-  white-space: pre-wrap;
+.streamer-capture {
+  margin-top: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 300px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.chat-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  flex-wrap: wrap;
+.streamer-capture-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.streamer-capture-image:hover {
+  transform: scale(1.02);
 }
 
 .audio-button {
@@ -297,27 +331,6 @@
 
 .audio-button.playing {
   background-color: var(--primary-hover);
-}
-
-.sentiment {
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-}
-
-.sentiment.positive {
-  background-color: rgba(0, 255, 163, 0.1);
-  color: var(--primary-color);
-}
-
-.sentiment.negative {
-  background-color: rgba(255, 0, 0, 0.1);
-  color: #ff4444;
-}
-
-.sentiment.neutral {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text-secondary);
 }
 
 .loading-more {
