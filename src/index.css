@@ -2,6 +2,138 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2a2a2a;
+    --border-color: #3a3a3a;
+  }
+}
+
+@layer components {
+  .chat-card {
+    @apply flex flex-col h-full bg-primary rounded-lg overflow-hidden opacity-0 animate-fade-in;
+  }
+
+  .user-header {
+    @apply p-4 bg-primary-light border-b border-secondary hidden;
+  }
+
+  .chat-card.loaded .user-header {
+    @apply flex flex-col gap-4;
+  }
+
+  .user-info {
+    @apply flex items-center gap-4;
+  }
+
+  .user-avatar {
+    @apply w-12 h-12 rounded-full bg-accent flex items-center justify-center text-xl font-bold;
+  }
+
+  .user-details {
+    @apply flex flex-col gap-1;
+  }
+
+  .user-name {
+    @apply text-lg font-semibold text-white;
+  }
+
+  .user-badges {
+    @apply flex gap-2;
+  }
+
+  .badge {
+    @apply px-2 py-1 rounded text-xs font-medium;
+  }
+
+  .badge.early_supporter {
+    @apply bg-purple-500 text-white;
+  }
+
+  .badge.chat_enthusiast {
+    @apply bg-blue-500 text-white;
+  }
+
+  .badge.gift_giver {
+    @apply bg-green-500 text-white;
+  }
+
+  .user-stats {
+    @apply grid grid-cols-3 gap-4;
+  }
+
+  .stat-item {
+    @apply flex flex-col gap-1;
+  }
+
+  .stat-label {
+    @apply text-sm text-gray-400;
+  }
+
+  .stat-value {
+    @apply text-sm font-medium text-white;
+  }
+
+  .chat-messages {
+    @apply flex-1 overflow-y-auto p-4 space-y-4;
+  }
+
+  .chat-message {
+    @apply p-4 rounded-lg bg-secondary;
+  }
+
+  .chat-message.streamer {
+    @apply bg-accent/10;
+  }
+
+  .chat-message.positive {
+    @apply border-l-4 border-green-500;
+  }
+
+  .chat-message.negative {
+    @apply border-l-4 border-red-500;
+  }
+
+  .chat-message.neutral {
+    @apply border-l-4 border-gray-500;
+  }
+
+  .message-header {
+    @apply flex justify-between items-center mb-2;
+  }
+
+  .message-timestamp {
+    @apply text-xs text-gray-400;
+  }
+
+  .message-game {
+    @apply text-xs px-2 py-1 rounded bg-accent/20 text-accent;
+  }
+
+  .message-content {
+    @apply text-white;
+  }
+
+  .audio-button {
+    @apply mt-2 p-2 rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors;
+  }
+
+  .audio-button.playing {
+    @apply bg-accent text-white;
+  }
+
+  .loading {
+    @apply flex items-center justify-center h-full text-gray-400;
+  }
+
+  .loading-more {
+    @apply text-center text-gray-400 py-4;
+  }
+}
+
 :root {
   font-family: system-ui, -apple-system, sans-serif;
   line-height: 1.5;
