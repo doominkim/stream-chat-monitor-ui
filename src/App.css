@@ -549,10 +549,9 @@ footer .footer-content {
   background-color: var(--bg-primary);
   border-radius: 0.75rem;
   border: 1px solid var(--border-color);
-  margin-top: 1rem;
   display: flex;
   flex-direction: column;
-  min-height: 1000px;
+  min-height: 300px;
 }
 
 .chat-header {
