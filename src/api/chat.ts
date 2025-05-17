@@ -68,11 +68,6 @@ export const getChatMessages = async (
   query: FindChannelChatDto = {}
 ): Promise<ChatMessage[]> => {
   try {
-    console.log("채팅 API 호출:", {
-      url: `/channel/${channelId}/chat/${chatChannelId}`,
-      query,
-    });
-
     const params = {
       limit: query.limit,
       chatType: query.chatType,
@@ -84,7 +79,6 @@ export const getChatMessages = async (
       { params }
     );
 
-    console.log("채팅 API 응답:", response.data);
     return response.data.items;
   } catch (error) {
     console.error("채팅 메시지 조회 실패:", error);
