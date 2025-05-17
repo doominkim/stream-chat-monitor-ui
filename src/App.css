@@ -1215,3 +1215,35 @@ body.hide-header-footer main {
   color: var(--text-secondary);
   font-size: 1.1rem;
 }
+
+.channel-select {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  min-width: 200px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.channel-select:hover {
+  border-color: var(--primary-color);
+}
+
+.channel-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(0, 255, 163, 0.2);
+}
+
+.error-message {
+  color: #ff4444;
+  text-align: center;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background-color: rgba(255, 68, 68, 0.1);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 68, 68, 0.2);
+}
