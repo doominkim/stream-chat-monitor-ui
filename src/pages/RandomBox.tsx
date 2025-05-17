@@ -201,6 +201,10 @@ const RandomBox: React.FC = () => {
 
   const handleShowResult = () => {
     if (board.length > 0) {
+      // 채팅 수집 중지
+      const currentTime = new Date();
+      setStartTime(currentTime); // 현재 시간으로 업데이트하여 이전 채팅 무시
+
       const randomIndex = Math.floor(Math.random() * board.length);
       const winningItem = board[randomIndex];
       setWinner(winningItem.id);
@@ -243,7 +247,8 @@ const RandomBox: React.FC = () => {
     setWinner(null);
     setShowConfetti(false);
     setShowWinnerMessage(false);
-    setWinners([]); // 당첨자 목록도 초기화
+    setWinners([]);
+    setStartTime(new Date());
     const initialBoard: BoardItem[] = Array.from(
       { length: 100 },
       (_, index) => ({
