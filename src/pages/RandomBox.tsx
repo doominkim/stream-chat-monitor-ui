@@ -30,6 +30,12 @@ const RandomBox: React.FC = () => {
   const [winners, setWinners] = useState<
     Array<{ id: number; userId: string; color: string }>
   >([]);
+  const [isConfigured, setIsConfigured] = useState(false);
+  const [collectionType, setCollectionType] = useState<"chat" | "donation">(
+    "chat"
+  );
+  const [donationAmount, setDonationAmount] = useState<number>(1000);
+  const [isCustomAmount, setIsCustomAmount] = useState(false);
   const partySound = new Audio(
     "https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3"
   );
@@ -198,105 +204,228 @@ const RandomBox: React.FC = () => {
     setBoard(initialBoard);
   };
 
+  const donationOptions = [
+    { value: 1000, label: "1,000원" },
+    { value: 5000, label: "5,000원" },
+    { value: 10000, label: "10,000원" },
+    { value: "custom", label: "직접 설정" },
+  ];
+
+  // 채널 변경 시 설정 초기화
+  const handleChannelSelect = (channel: Channel | null) => {
+    setSelectedChannel(channel);
+    setIsConfigured(false);
+    setCollectionType("chat");
+    setDonationAmount(1000);
+    setIsCustomAmount(false);
+    setSelectedItems([]);
+    setParticipants(new Set());
+    setWinner(null);
+    setShowConfetti(false);
+    setShowWinnerMessage(false);
+    setWinners([]);
+    const initialBoard: BoardItem[] = Array.from(
+      { length: 100 },
+      (_, index) => ({
+        id: index + 1,
+      })
+    );
+    setBoard(initialBoard);
+  };
+
+  const handleDonationAmountChange = (value: number | "custom") => {
+    if (value === "custom") {
+      setIsCustomAmount(true);
+    } else {
+      setIsCustomAmount(false);
+      setDonationAmount(value);
+    }
+  };
+
   return (
     <div className="subtitle-page">
       <div className="subtitle-layout">
         <div className="subtitle-sidebar">
           <ChannelNavigator
             selectedChannel={selectedChannel}
-            onChannelSelect={setSelectedChannel}
+            onChannelSelect={handleChannelSelect}
           />
         </div>
         <div className="subtitle-content">
-          <div className="random-box-container">
-            <div className="box-header">
-              <h1>!뽑기를 쳐보세요</h1>
-              <p className="box-warning">
-                ⚠️ 새로고침 시 모든 내역이 사라집니다
-              </p>
-              <div className="button-group">
-                <button onClick={handleMockDraw} className="mock-draw-btn">
-                  !뽑기
-                </button>
-                <button onClick={handleShowResult} className="show-result-btn">
-                  결과보기
-                </button>
-                <button onClick={handleReset} className="reset-btn">
-                  다시하기
-                </button>
-              </div>
-            </div>
-            {showWinnerMessage && winner && (
-              <div className="winner-message">
-                {selectedItems.includes(winner)
-                  ? `${
-                      board.find((item) => item.id === winner)?.userId
-                    }님 축하합니다!`
-                  : "꽝! 다음 기회에..."}
-              </div>
-            )}
-            {showConfetti && (
-              <div className="confetti-container">
-                {Array.from({ length: 150 }).map((_, index) => (
-                  <div
-                    key={index}
-                    className="confetti"
-                    style={{
-                      left: `${Math.random() * 100}vw`,
-                      animationDuration: `${0.5 + Math.random() * 0.5}s`,
-                      animationDelay: `${Math.random() * 0.2}s`,
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-            <div className="box-content">
-              <div className="board-container">
-                <div className="board-grid">
-                  {board.map((item) => (
-                    <div
-                      key={item.id}
-                      className={`board-item ${
-                        selectedItems.includes(item.id) ? "selected" : ""
-                      } ${winner === item.id ? "winner-animate" : ""}`}
-                      style={{
-                        boxShadow: selectedItems.includes(item.id)
-                          ? "0 0 10px 5px rgba(0, 0, 0, 0.2)"
-                          : "none",
-                      }}
-                      data-tooltip={
-                        selectedItems.includes(item.id) ? item.userId : ""
+          {!isConfigured ? (
+            <div className="configuration-container">
+              <h2>랜덤박스 설정</h2>
+              <div className="config-section">
+                <h3>수집 방식 선택</h3>
+                <div className="radio-group">
+                  <label>
+                    <input
+                      type="radio"
+                      value="chat"
+                      checked={collectionType === "chat"}
+                      onChange={(e) =>
+                        setCollectionType(e.target.value as "chat")
                       }
-                    >
-                      {selectedItems.includes(item.id) ? (
-                        <span style={{ color: item.color }}>{item.userId}</span>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                  ))}
+                    />
+                    채팅 수집
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      value="donation"
+                      checked={collectionType === "donation"}
+                      onChange={(e) =>
+                        setCollectionType(e.target.value as "donation")
+                      }
+                    />
+                    후원 수집
+                  </label>
                 </div>
               </div>
+              {collectionType === "donation" && (
+                <div className="config-section">
+                  <h3>후원 금액</h3>
+                  <div className="donation-options">
+                    {donationOptions.map((option) => (
+                      <label key={option.value} className="donation-option">
+                        <input
+                          type="radio"
+                          name="donationAmount"
+                          value={option.value}
+                          checked={
+                            option.value === "custom"
+                              ? isCustomAmount
+                              : !isCustomAmount &&
+                                donationAmount === option.value
+                          }
+                          onChange={() =>
+                            handleDonationAmountChange(option.value)
+                          }
+                        />
+                        <span>{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {isCustomAmount && (
+                    <div className="amount-input">
+                      <input
+                        type="number"
+                        value={donationAmount}
+                        onChange={(e) =>
+                          setDonationAmount(Number(e.target.value))
+                        }
+                        min="100"
+                        step="100"
+                      />
+                      <span>원</span>
+                    </div>
+                  )}
+                </div>
+              )}
+              <button
+                className="start-btn"
+                onClick={() => setIsConfigured(true)}
+                disabled={!selectedChannel}
+              >
+                시작하기
+              </button>
             </div>
-            {winners.length > 0 && (
-              <div className="winners-section">
-                <h2>당첨자 목록</h2>
-                <div className="winners-list">
-                  {winners.map((winner, index) => (
-                    <div key={winner.id} className="winner-item">
-                      <span className="winner-number">{index + 1}</span>
-                      <span
-                        className="winner-name"
-                        style={{ color: winner.color }}
-                      >
-                        {winner.userId}
-                      </span>
-                    </div>
-                  ))}
+          ) : (
+            <div className="random-box-container">
+              <div className="box-header">
+                <h1>!뽑기를 쳐보세요</h1>
+                <p className="box-warning">
+                  ⚠️ 새로고침 시 모든 내역이 사라집니다
+                </p>
+                <div className="button-group">
+                  <button onClick={handleMockDraw} className="mock-draw-btn">
+                    !뽑기
+                  </button>
+                  <button
+                    onClick={handleShowResult}
+                    className="show-result-btn"
+                  >
+                    결과보기
+                  </button>
+                  <button onClick={handleReset} className="reset-btn">
+                    다시하기
+                  </button>
                 </div>
               </div>
-            )}
-          </div>
+              {showWinnerMessage && winner && (
+                <div className="winner-message">
+                  {selectedItems.includes(winner)
+                    ? `${
+                        board.find((item) => item.id === winner)?.userId
+                      }님 축하합니다!`
+                    : "꽝! 다음 기회에..."}
+                </div>
+              )}
+              {showConfetti && (
+                <div className="confetti-container">
+                  {Array.from({ length: 150 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="confetti"
+                      style={{
+                        left: `${Math.random() * 100}vw`,
+                        animationDuration: `${0.5 + Math.random() * 0.5}s`,
+                        animationDelay: `${Math.random() * 0.2}s`,
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+              <div className="box-content">
+                <div className="board-container">
+                  <div className="board-grid">
+                    {board.map((item) => (
+                      <div
+                        key={item.id}
+                        className={`board-item ${
+                          selectedItems.includes(item.id) ? "selected" : ""
+                        } ${winner === item.id ? "winner-animate" : ""}`}
+                        style={{
+                          boxShadow: selectedItems.includes(item.id)
+                            ? "0 0 10px 5px rgba(0, 0, 0, 0.2)"
+                            : "none",
+                        }}
+                        data-tooltip={
+                          selectedItems.includes(item.id) ? item.userId : ""
+                        }
+                      >
+                        {selectedItems.includes(item.id) ? (
+                          <span style={{ color: item.color }}>
+                            {item.userId}
+                          </span>
+                        ) : (
+                          ""
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              {winners.length > 0 && (
+                <div className="winners-section">
+                  <h2>당첨자 목록</h2>
+                  <div className="winners-list">
+                    {winners.map((winner, index) => (
+                      <div key={winner.id} className="winner-item">
+                        <span className="winner-number">{index + 1}</span>
+                        <span
+                          className="winner-name"
+                          style={{ color: winner.color }}
+                        >
+                          {winner.userId}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
