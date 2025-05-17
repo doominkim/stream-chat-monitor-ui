@@ -165,6 +165,12 @@ const Subtitle = () => {
     return groups;
   };
 
+  const handleChannelSelect = (channel: Channel) => {
+    setSelectedChannel(channel);
+    // 채널 선택 후 스크롤을 맨 아래로 이동
+    setTimeout(scrollToBottom, 100);
+  };
+
   return (
     <div className="subtitle-page">
       <div className="subtitle-layout">
@@ -183,7 +189,7 @@ const Subtitle = () => {
                   className={`channel-card ${
                     selectedChannel?.id === channel.id ? "selected" : ""
                   }`}
-                  onClick={() => setSelectedChannel(channel)}
+                  onClick={() => handleChannelSelect(channel)}
                 >
                   <div className="channel-info">
                     <div
