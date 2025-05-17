@@ -391,6 +391,7 @@ footer .footer-content {
 .footer-links {
   display: flex;
   gap: 1.5rem;
+  align-items: center;
 }
 
 .footer-link {
@@ -398,10 +399,29 @@ footer .footer-content {
   text-decoration: none;
   font-size: 0.875rem;
   transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .footer-link:hover {
   color: var(--primary-color);
+}
+
+.footer-link.github {
+  color: var(--text-secondary);
+}
+
+.footer-link.github:hover {
+  color: #fff;
+}
+
+.footer-link.blog {
+  color: var(--text-secondary);
+}
+
+.footer-link.blog:hover {
+  color: #fff;
 }
 
 /* User Detail Page */
