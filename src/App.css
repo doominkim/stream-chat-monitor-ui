@@ -1194,6 +1194,43 @@ body.hide-header-footer main {
   flex-direction: column;
 }
 
+.subtitle-main {
+  flex: 8;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.subtitle-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+  padding: 1.5rem;
+  overflow: hidden;
+}
+
+.subtitle-controls {
+  margin: 1rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+.subtitle-display {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-secondary);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  padding: 2rem;
+  margin-top: 1rem;
+  overflow-y: auto;
+}
+
 .channel-navigator {
   height: 100%;
   display: flex;
@@ -1302,18 +1339,6 @@ body.hide-header-footer main {
     linear-gradient(45deg, #00ffa3, #006f5f) border-box;
 }
 
-.channel-avatar .live-indicator {
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 8px;
-  height: 8px;
-  background-color: #ff0000;
-  border-radius: 50%;
-  border: 2px solid var(--bg-secondary);
-  animation: pulse 1.5s infinite;
-}
-
 .channel-details {
   flex: 1;
   min-width: 0;
@@ -1352,34 +1377,6 @@ body.hide-header-footer main {
   flex-wrap: wrap;
 }
 
-.channel-status {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: #666;
-}
-
-.live-indicator {
-  width: 6px;
-  height: 6px;
-  background-color: #ff0000;
-  border-radius: 50%;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
 .channel-viewers {
   box-sizing: border-box;
   color: rgb(255, 84, 84);
@@ -1410,40 +1407,4 @@ body.hide-header-footer main {
 .channel-navigator-count {
   font-size: 0.875rem;
   color: var(--text-secondary);
-}
-
-.subtitle-main {
-  flex: 8;
-  overflow: hidden;
-  height: 100%;
-}
-
-.subtitle-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--bg-primary);
-  border-radius: 0.75rem;
-  border: 1px solid var(--border-color);
-  padding: 1.5rem;
-  overflow: hidden;
-}
-
-.subtitle-controls {
-  margin: 1rem 0;
-  display: flex;
-  justify-content: center;
-}
-
-.subtitle-display {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--bg-secondary);
-  border-radius: 0.5rem;
-  border: 1px solid var(--border-color);
-  padding: 2rem;
-  margin-top: 1rem;
-  overflow-y: auto;
 }
