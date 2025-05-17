@@ -9,10 +9,8 @@ import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 
 const Subtitle = () => {
-  const [isStreaming, setIsStreaming] = useState(false);
   const [channels, setChannels] = useState<Channel[]>([]);
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [transcripts, setTranscripts] = useState<Transcript[]>([]);
   const [loading, setLoading] = useState(false);
@@ -21,11 +19,21 @@ const Subtitle = () => {
   const observer = useRef<IntersectionObserver | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const subtitleDisplayRef = useRef<HTMLDivElement>(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
 
   const scrollToBottom = () => {
     if (subtitleDisplayRef.current) {
       subtitleDisplayRef.current.scrollTop =
         subtitleDisplayRef.current.scrollHeight;
+    }
+  };
+
+  const handleScroll = () => {
+    if (subtitleDisplayRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } =
+        subtitleDisplayRef.current;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+      setShowScrollButton(!isNearBottom);
     }
   };
 
@@ -45,7 +53,6 @@ const Subtitle = () => {
 
   const fetchChannels = async () => {
     try {
-      setIsLoading(true);
       setError(null);
       const data = await getChannels();
       console.log("채널 목록:", data);
@@ -55,8 +62,6 @@ const Subtitle = () => {
       setError(
         err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -96,9 +101,11 @@ const Subtitle = () => {
   }, []);
 
   useEffect(() => {
-    if (!selectedChannel || !isStreaming) return;
+    if (!selectedChannel) return;
 
     // 초기 데이터 로드
+    setTranscripts([]); // 기존 자막 초기화
+    setOffset(0); // offset 초기화
     fetchTranscripts();
 
     // 5초마다 새로운 데이터 로드
@@ -111,24 +118,7 @@ const Subtitle = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [selectedChannel, isStreaming]);
-
-  const handleStartStreaming = () => {
-    if (!selectedChannel) {
-      setError("채널을 선택해주세요.");
-      return;
-    }
-    setIsStreaming(true);
-    setTranscripts([]); // 자막 시작 시 기존 자막 초기화
-    setOffset(0); // offset 초기화
-  };
-
-  const handleStopStreaming = () => {
-    setIsStreaming(false);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-  };
+  }, [selectedChannel]);
 
   return (
     <div className="subtitle-page">
@@ -182,28 +172,13 @@ const Subtitle = () => {
         </div>
         <div className="subtitle-main">
           <div className="subtitle-container">
-            <h1>AI 방송 자막</h1>
-            <div className="subtitle-controls">
-              {!isStreaming ? (
-                <button
-                  className="button button-primary"
-                  onClick={handleStartStreaming}
-                  disabled={isLoading || !selectedChannel}
-                >
-                  {isLoading ? "로딩 중..." : "자막 시작"}
-                </button>
-              ) : (
-                <button
-                  className="button button-secondary"
-                  onClick={handleStopStreaming}
-                >
-                  자막 중지
-                </button>
-              )}
-            </div>
             {error && <div className="error-message">{error}</div>}
-            <div className="subtitle-display" ref={subtitleDisplayRef}>
-              {isStreaming ? (
+            <div
+              className="subtitle-display"
+              ref={subtitleDisplayRef}
+              onScroll={handleScroll}
+            >
+              {selectedChannel ? (
                 <>
                   {transcripts.map((transcript, index) => (
                     <div
@@ -225,11 +200,18 @@ const Subtitle = () => {
                     </div>
                   ))}
                   {loading && <div className="loading">로딩 중...</div>}
+                  <button
+                    className={`scroll-to-bottom ${
+                      showScrollButton ? "visible" : ""
+                    }`}
+                    onClick={scrollToBottom}
+                    title="맨 아래로"
+                  >
+                    ↓
+                  </button>
                 </>
               ) : (
-                <div className="subtitle-placeholder">
-                  채널을 선택하고 자막 시작 버튼을 눌러주세요
-                </div>
+                <div className="subtitle-placeholder">채널을 선택해주세요</div>
               )}
             </div>
           </div>
