@@ -1306,6 +1306,7 @@ body.hide-header-footer main {
   width: 100%;
   box-sizing: border-box;
   position: relative;
+  overflow-x: hidden;
 }
 
 .transcript-date-group {
@@ -1367,20 +1368,28 @@ body.hide-header-footer main {
 
 .subtitle-placeholder {
   color: var(--text-secondary);
-  font-size: 4rem;
+  font-size: 20rem;
   font-weight: 700;
   text-align: center;
   width: 100%;
+  height: 100%;
   padding: 4rem;
-  background-color: #2a2a2a;
+  background-color: transparent;
   border-radius: 8px;
-  border: 1px dashed #3a3a3a;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 200px;
   letter-spacing: -2px;
   opacity: 0.5;
+  box-sizing: border-box;
+  word-break: keep-all;
+  white-space: nowrap;
+  line-height: 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
 }
 
 .loading {

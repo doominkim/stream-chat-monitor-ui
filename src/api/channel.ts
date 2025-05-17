@@ -61,7 +61,7 @@ export const getTranscripts = async (
 ): Promise<{ items: Transcript[]; total: number; hasMore: boolean }> => {
   try {
     const response = await apiClient.get(
-      `/channel/${channelId}/transcript?offset=${offset}&limit=${limit}&sort=ASC`
+      `/channel/${channelId}/transcript?limit=${limit}&sort=ASC`
     );
     return response.data;
   } catch (error) {
