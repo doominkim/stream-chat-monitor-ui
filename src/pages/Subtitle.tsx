@@ -73,7 +73,7 @@ const Subtitle = () => {
                       <div className="channel-meta">
                         <div className="channel-status">라이브</div>
                         <div className="channel-viewers">
-                          팔로워 {channel.follower.toLocaleString()}
+                          • {channel.follower.toLocaleString()}
                         </div>
                       </div>
                     </div>
