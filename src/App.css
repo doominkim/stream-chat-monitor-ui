@@ -427,8 +427,8 @@ footer .footer-content {
 }
 
 .user-avatar {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   background-color: var(--primary-color);
   color: var(--bg-primary);
   border-radius: 50%;
@@ -1173,33 +1173,15 @@ body.hide-header-footer main {
 /* Subtitle page styles */
 .subtitle-page {
   padding: 1rem;
-  height: calc(100vh - 3.5rem - 4rem); /* 전체 높이 - header - footer */
-  overflow-y: auto;
-  padding-bottom: 6rem; /* footer 높이(4rem) + 여유 공간(2rem) */
-}
-
-.subtitle-page::-webkit-scrollbar {
-  width: 6px;
-}
-
-.subtitle-page::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-  border-radius: 3px;
-}
-
-.subtitle-page::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 3px;
-}
-
-.subtitle-page::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-color);
+  height: calc(100vh - 3.5rem - 4rem);
+  overflow: hidden;
+  padding-bottom: 6rem;
 }
 
 .subtitle-layout {
   display: flex;
   gap: 1rem;
-  min-height: 100%;
+  height: 100%;
   padding-bottom: 1rem;
 }
 
@@ -1207,44 +1189,9 @@ body.hide-header-footer main {
   flex: 2;
   min-width: 300px;
   max-width: 400px;
-  overflow: hidden;
-  height: 100%;
-}
-
-.subtitle-main {
-  flex: 8;
-  overflow: hidden;
-  height: 100%;
-}
-
-.subtitle-container {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-primary);
-  border-radius: 0.75rem;
-  border: 1px solid var(--border-color);
-  padding: 1.5rem;
-  overflow: hidden;
-}
-
-.subtitle-controls {
-  margin: 1rem 0;
-  display: flex;
-  justify-content: center;
-}
-
-.subtitle-display {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--bg-secondary);
-  border-radius: 0.5rem;
-  border: 1px solid var(--border-color);
-  padding: 2rem;
-  margin-top: 1rem;
-  overflow-y: auto;
 }
 
 .channel-navigator {
@@ -1297,10 +1244,10 @@ body.hide-header-footer main {
   background-color: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 0.5rem;
-  padding: 0.75rem;
+  padding: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-bottom: 0.5rem;
+  margin-bottom: 3px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -1329,8 +1276,8 @@ body.hide-header-footer main {
 }
 
 .channel-avatar {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
@@ -1463,4 +1410,40 @@ body.hide-header-footer main {
 .channel-navigator-count {
   font-size: 0.875rem;
   color: var(--text-secondary);
+}
+
+.subtitle-main {
+  flex: 8;
+  overflow: hidden;
+  height: 100%;
+}
+
+.subtitle-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+  padding: 1.5rem;
+  overflow: hidden;
+}
+
+.subtitle-controls {
+  margin: 1rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+.subtitle-display {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-secondary);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  padding: 2rem;
+  margin-top: 1rem;
+  overflow-y: auto;
 }
