@@ -51,6 +51,7 @@ export interface FindChannelChatDto {
 
 export interface ChatMessage {
   user: string;
+  nickname: string;
   message: string;
   timestamp: string;
 }

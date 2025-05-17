@@ -124,17 +124,17 @@ const RandomBox: React.FC = () => {
           );
 
           messages.forEach((msg) => {
-            if (!participants.has(msg.user)) {
+            if (!participants.has(msg.nickname)) {
               const randomIndex = Math.floor(Math.random() * board.length);
               const selectedItem = board[randomIndex];
               if (!selectedItems.includes(selectedItem.id)) {
-                setParticipants((prev) => new Set(prev).add(msg.user));
+                setParticipants((prev) => new Set(prev).add(msg.nickname));
                 setSelectedItems((prev) => [...prev, selectedItem.id]);
                 setBoard((prev) => {
                   const newBoard = [...prev];
                   newBoard[randomIndex] = {
                     ...selectedItem,
-                    userId: msg.user,
+                    userId: msg.nickname,
                     color: getRandomColor(),
                   };
                   return newBoard;
