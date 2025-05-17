@@ -12,6 +12,7 @@ import ChatHistory from "./pages/ChatHistory";
 import Subtitle from "./pages/Subtitle";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import HealthStatus from "./components/HealthStatus";
 import "./App.css";
 
 function App() {
@@ -27,10 +28,12 @@ function App() {
             <Route path="/user/:userId" element={<UserDetail />} />
             <Route path="/user/:userId/chat" element={<ChatHistory />} />
             <Route path="/subtitle" element={<Subtitle />} />
-            <Route path="/" element={<Navigate to="/search" replace />} />
+            <Route path="/" element={<Navigate to="/subtitle" replace />} />
           </Routes>
         </main>
-        <Footer />
+        <Footer>
+          <HealthStatus />
+        </Footer>
       </div>
     </Router>
   );
