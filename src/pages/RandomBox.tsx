@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from "react";
 import "../styles/RandomBox.css";
 import ChannelNavigator from "../components/ChannelNavigator";
-
-interface Channel {
-  id: string;
-  name: string;
-  logo: string;
-  openLive: boolean;
-  follower: number;
-  gameCategory?: string;
-  isEnabledAi: boolean;
-}
+import { getChatMessages, ChatType } from "../api/chat";
+import { Channel } from "../api/channel";
 
 interface BoardItem {
   id: number;
   userId?: string;
   borderColor?: string;
   color?: string;
+}
+
+interface Winner {
+  id: number;
+  userId: string;
+  color: string;
 }
 
 const RandomBox: React.FC = () => {
@@ -27,9 +25,7 @@ const RandomBox: React.FC = () => {
   const [winner, setWinner] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showWinnerMessage, setShowWinnerMessage] = useState(false);
-  const [winners, setWinners] = useState<
-    Array<{ id: number; userId: string; color: string }>
-  >([]);
+  const [winners, setWinners] = useState<Winner[]>([]);
   const [isConfigured, setIsConfigured] = useState(false);
   const [collectionType, setCollectionType] = useState<"chat" | "donation">(
     "chat"
@@ -38,9 +34,6 @@ const RandomBox: React.FC = () => {
   const [isCustomAmount, setIsCustomAmount] = useState(false);
   const partySound = new Audio(
     "https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3"
-  );
-  const failSound = new Audio(
-    "https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"
   );
   const disappointmentSound = new Audio(
     "https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3"
@@ -105,18 +98,69 @@ const RandomBox: React.FC = () => {
     setBoard(initialBoard);
   }, []);
 
-  const handleItemSelect = (itemId: number) => {
-    setSelectedItems((prev) => {
-      if (prev.includes(itemId)) {
-        return prev.filter((id) => id !== itemId);
-      }
-      if (prev.length >= 3) {
-        alert("최대 3개의 아이템만 선택할 수 있습니다.");
-        return prev;
-      }
-      return [...prev, itemId];
-    });
-  };
+  useEffect(() => {
+    if (
+      selectedChannel &&
+      isConfigured &&
+      selectedChannel.channelLive?.chatChannelId
+    ) {
+      const fetchChatMessages = async () => {
+        try {
+          const now = new Date();
+          const chatChannelId = selectedChannel.channelLive.chatChannelId;
+
+          if (!chatChannelId) return;
+
+          const messages = await getChatMessages(
+            selectedChannel.uuid,
+            chatChannelId,
+            {
+              limit: 20,
+              chatType:
+                collectionType === "chat" ? ChatType.CHAT : ChatType.DONATION,
+              from: now,
+            }
+          );
+
+          messages.forEach((msg) => {
+            if (!participants.has(msg.user)) {
+              const randomIndex = Math.floor(Math.random() * board.length);
+              const selectedItem = board[randomIndex];
+              if (!selectedItems.includes(selectedItem.id)) {
+                setParticipants((prev) => new Set(prev).add(msg.user));
+                setSelectedItems((prev) => [...prev, selectedItem.id]);
+                setBoard((prev) => {
+                  const newBoard = [...prev];
+                  newBoard[randomIndex] = {
+                    ...selectedItem,
+                    userId: msg.user,
+                    color: getRandomColor(),
+                  };
+                  return newBoard;
+                });
+              }
+            }
+          });
+        } catch (error) {
+          console.error("채팅 메시지 조회 실패:", error);
+        }
+      };
+
+      fetchChatMessages();
+      const interval = setInterval(fetchChatMessages, 5000);
+
+      return () => {
+        clearInterval(interval);
+      };
+    }
+  }, [
+    selectedChannel,
+    isConfigured,
+    collectionType,
+    board,
+    participants,
+    selectedItems,
+  ]);
 
   const getRandomColor = () => {
     const letters = "0123456789ABCDEF";
@@ -155,25 +199,20 @@ const RandomBox: React.FC = () => {
       setWinner(winningItem.id);
       setShowWinnerMessage(true);
 
-      // 당첨된 경우와 꽝인 경우 다른 효과음 재생
       if (selectedItems.includes(winningItem.id)) {
         setShowConfetti(true);
         partySound.play().catch((err) => console.log("소리 재생 실패:", err));
 
-        // 당첨자 목록에 추가
         const winnerInfo = board.find((item) => item.id === winningItem.id);
-        if (winnerInfo && winnerInfo.userId && winnerInfo.color) {
-          setWinners((prev) => [
-            ...prev,
-            {
-              id: winnerInfo.id,
-              userId: winnerInfo.userId,
-              color: winnerInfo.color,
-            },
-          ]);
+        if (winnerInfo?.userId && winnerInfo?.color) {
+          const winner: Winner = {
+            id: winnerInfo.id,
+            userId: winnerInfo.userId,
+            color: winnerInfo.color,
+          };
+          setWinners((prev) => [...prev, winner]);
         }
 
-        // 3초 후 폭죽 숨기기
         setTimeout(() => {
           setShowConfetti(false);
         }, 3000);
@@ -183,7 +222,6 @@ const RandomBox: React.FC = () => {
           .catch((err) => console.log("소리 재생 실패:", err));
       }
 
-      // 5초 후 메시지 숨기기
       setTimeout(() => {
         setShowWinnerMessage(false);
       }, 5000);
@@ -212,7 +250,7 @@ const RandomBox: React.FC = () => {
     { value: 1000, label: "1,000원" },
     { value: 5000, label: "5,000원" },
     { value: 10000, label: "10,000원" },
-    { value: "custom", label: "직접 설정" },
+    { value: "custom" as const, label: "직접 설정" },
   ];
 
   // 채널 변경 시 설정 초기화
@@ -244,6 +282,14 @@ const RandomBox: React.FC = () => {
       setIsCustomAmount(false);
       setDonationAmount(value);
     }
+  };
+
+  const handleStart = () => {
+    if (!selectedChannel?.channelLive?.chatChannelId) {
+      alert("채널 정보가 올바르지 않습니다.");
+      return;
+    }
+    setIsConfigured(true);
   };
 
   return (
@@ -328,7 +374,7 @@ const RandomBox: React.FC = () => {
               )}
               <button
                 className="start-btn"
-                onClick={() => setIsConfigured(true)}
+                onClick={handleStart}
                 disabled={!selectedChannel}
               >
                 시작하기
@@ -437,9 +483,3 @@ const RandomBox: React.FC = () => {
 };
 
 export default RandomBox;
-
-// 가상의 채팅 수집 함수
-function getNewChat() {
-  // 실제 구현에서는 채팅 API를 통해 데이터를 가져와야 합니다.
-  return { user: "사용자1", message: "!뽑기" };
-}

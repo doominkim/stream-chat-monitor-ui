@@ -31,3 +31,77 @@ export const getChatStats = async (userId: string) => {
     throw error;
   }
 };
+
+export enum ChatType {
+  CHAT = "CHAT",
+  DONATION = "DONATION",
+  SUBSCRIPTION = "SUBSCRIPTION",
+  GIFT = "GIFT",
+}
+
+export interface FindChannelChatDto {
+  limit?: number;
+  from?: Date;
+  to?: Date;
+  message?: string;
+  userIdHash?: string;
+  nickname?: string;
+  chatType?: ChatType;
+}
+
+export interface ChatMessage {
+  user: string;
+  message: string;
+  timestamp: string;
+}
+
+export interface ChatResponse {
+  items: ChatMessage[];
+  total: number;
+  hasMore: boolean;
+}
+
+export const getChatMessages = async (
+  channelId: string,
+  chatChannelId: string,
+  query: FindChannelChatDto = {}
+): Promise<ChatMessage[]> => {
+  try {
+    console.log("채팅 API 호출:", {
+      url: `/channel/${channelId}/chat/${chatChannelId}`,
+      query,
+    });
+
+    const response = await apiClient.get<ChatResponse>(
+      `/channel/${channelId}/chat/${chatChannelId}`,
+      {
+        params: {
+          limit: query.limit,
+          chatType: query.chatType,
+          from: query.from,
+        },
+      }
+    );
+
+    console.log("채팅 API 응답:", response.data);
+    return response.data.items;
+  } catch (error) {
+    console.error("채팅 메시지 조회 실패:", error);
+    return [];
+  }
+};
+
+export const getTranscripts = async (
+  channelId: string,
+  limit: number = 100
+) => {
+  try {
+    const response = await apiClient.get(`/channel/${channelId}/transcript`, {
+      params: { limit },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("자막 조회 실패:", error);
+    return [];
+  }
+};

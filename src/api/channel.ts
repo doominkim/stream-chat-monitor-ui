@@ -56,7 +56,6 @@ export interface Transcript {
 
 export const getTranscripts = async (
   channelId: string,
-  offset: number,
   limit: number = 20
 ): Promise<{ items: Transcript[]; total: number; hasMore: boolean }> => {
   try {

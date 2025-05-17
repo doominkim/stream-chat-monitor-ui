@@ -3,15 +3,7 @@ import { getTranscripts, Transcript } from "../api/channel";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import ChannelNavigator from "../components/ChannelNavigator";
-
-interface Channel {
-  id: string;
-  name: string;
-  logo: string;
-  openLive: boolean;
-  follower: number;
-  gameCategory?: string;
-}
+import { Channel } from "../api/channel";
 
 const Subtitle = () => {
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
@@ -48,7 +40,7 @@ const Subtitle = () => {
     if (!selectedChannel) return;
     try {
       setLoading(true);
-      const result = await getTranscripts(selectedChannel.id, 0, limit);
+      const result = await getTranscripts(selectedChannel.uuid, limit);
 
       // 새로운 자막만 추가
       setTranscripts((prev) => {

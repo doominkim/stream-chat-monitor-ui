@@ -1,21 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "../styles/ChannelNavigator.css";
-import { getChannels } from "../api/channel";
-
-interface Channel {
-  id: string;
-  name: string;
-  logo: string;
-  openLive: boolean;
-  follower: number;
-  gameCategory?: string;
-  isEnabledAi: boolean;
-}
+import { getChannels, Channel } from "../api/channel";
 
 interface ChannelNavigatorProps {
-  selectedChannel?: Channel | null;
-  onChannelSelect?: (channel: Channel) => void;
+  selectedChannel: Channel | null;
+  onChannelSelect: (channel: Channel | null) => void;
   className?: string;
 }
 
@@ -32,16 +22,7 @@ const ChannelNavigator: React.FC<ChannelNavigatorProps> = ({
     const fetchChannels = async () => {
       try {
         const data = await getChannels();
-        const formattedChannels: Channel[] = data.map((channel) => ({
-          id: channel.uuid,
-          name: channel.channelName,
-          logo: channel.channelImageUrl,
-          openLive: channel.openLive,
-          follower: channel.follower,
-          gameCategory: channel.channelLive?.liveCategory?.liveCategoryValue,
-          isEnabledAi: channel.isEnabledAi,
-        }));
-        setChannels(formattedChannels);
+        setChannels(data);
       } catch (err) {
         console.error("채널 목록을 불러오는데 실패했습니다:", err);
       }
@@ -61,9 +42,9 @@ const ChannelNavigator: React.FC<ChannelNavigatorProps> = ({
         {channels.map((channel) =>
           onChannelSelect ? (
             <div
-              key={channel.id}
+              key={channel.uuid}
               className={`channel-card ${
-                selectedChannel?.id === channel.id ? "selected" : ""
+                selectedChannel?.uuid === channel.uuid ? "selected" : ""
               }`}
               onClick={() => onChannelSelect(channel)}
             >
@@ -71,19 +52,22 @@ const ChannelNavigator: React.FC<ChannelNavigatorProps> = ({
                 <div
                   className={`channel-avatar ${channel.openLive ? "live" : ""}`}
                 >
-                  <img src={channel.logo} alt={channel.name} />
+                  <img
+                    src={channel.channelImageUrl}
+                    alt={channel.channelName}
+                  />
                 </div>
                 <div className="channel-details">
                   <div className="channel-name">
-                    {channel.name}
+                    {channel.channelName}
                     {channel.isEnabledAi && (
                       <span className="ai-tag">AI 분석중</span>
                     )}
                   </div>
                   <div className="channel-meta">
-                    {channel.gameCategory && (
+                    {channel.channelLive?.liveCategory?.liveCategoryValue && (
                       <span className="channel-category">
-                        {channel.gameCategory}
+                        {channel.channelLive.liveCategory.liveCategoryValue}
                       </span>
                     )}
                     {channel.openLive && (
@@ -97,27 +81,30 @@ const ChannelNavigator: React.FC<ChannelNavigatorProps> = ({
             </div>
           ) : (
             <Link
-              key={channel.id}
-              to={`/channel/${channel.id}${currentPath}`}
+              key={channel.uuid}
+              to={`/channel/${channel.uuid}${currentPath}`}
               className="channel-card"
             >
               <div className="channel-info">
                 <div
                   className={`channel-avatar ${channel.openLive ? "live" : ""}`}
                 >
-                  <img src={channel.logo} alt={channel.name} />
+                  <img
+                    src={channel.channelImageUrl}
+                    alt={channel.channelName}
+                  />
                 </div>
                 <div className="channel-details">
                   <div className="channel-name">
-                    {channel.name}
+                    {channel.channelName}
                     {channel.isEnabledAi && (
                       <span className="ai-tag">AI 분석중</span>
                     )}
                   </div>
                   <div className="channel-meta">
-                    {channel.gameCategory && (
+                    {channel.channelLive?.liveCategory?.liveCategoryValue && (
                       <span className="channel-category">
-                        {channel.gameCategory}
+                        {channel.channelLive.liveCategory.liveCategoryValue}
                       </span>
                     )}
                     {channel.openLive && (
