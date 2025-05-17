@@ -32,6 +32,7 @@ const RandomBox: React.FC = () => {
   );
   const [donationAmount, setDonationAmount] = useState<number>(1000);
   const [isCustomAmount, setIsCustomAmount] = useState(false);
+  const [startTime, setStartTime] = useState<Date | null>(null);
   const partySound = new Audio(
     "https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3"
   );
@@ -102,11 +103,11 @@ const RandomBox: React.FC = () => {
     if (
       selectedChannel &&
       isConfigured &&
-      selectedChannel.channelLive?.chatChannelId
+      selectedChannel.channelLive?.chatChannelId &&
+      startTime
     ) {
       const fetchChatMessages = async () => {
         try {
-          const now = new Date();
           const chatChannelId = selectedChannel.channelLive.chatChannelId;
 
           if (!chatChannelId) return;
@@ -118,7 +119,7 @@ const RandomBox: React.FC = () => {
               limit: 20,
               chatType:
                 collectionType === "chat" ? ChatType.CHAT : ChatType.DONATION,
-              from: now,
+              from: startTime,
             }
           );
 
@@ -160,6 +161,7 @@ const RandomBox: React.FC = () => {
     board,
     participants,
     selectedItems,
+    startTime,
   ]);
 
   const getRandomColor = () => {
@@ -285,10 +287,7 @@ const RandomBox: React.FC = () => {
   };
 
   const handleStart = () => {
-    if (!selectedChannel?.channelLive?.chatChannelId) {
-      alert("채널 정보가 올바르지 않습니다.");
-      return;
-    }
+    setStartTime(new Date());
     setIsConfigured(true);
   };
 

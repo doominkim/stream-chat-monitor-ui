@@ -72,15 +72,15 @@ export const getChatMessages = async (
       query,
     });
 
+    const params = {
+      limit: query.limit,
+      chatType: query.chatType,
+      from: query.from instanceof Date ? query.from.toISOString() : query.from,
+    };
+
     const response = await apiClient.get<ChatResponse>(
       `/channel/${channelId}/chat/${chatChannelId}`,
-      {
-        params: {
-          limit: query.limit,
-          chatType: query.chatType,
-          from: query.from,
-        },
-      }
+      { params }
     );
 
     console.log("채팅 API 응답:", response.data);
