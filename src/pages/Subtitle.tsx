@@ -13,8 +13,10 @@ const Subtitle = () => {
       setIsLoading(true);
       setError(null);
       const data = await getChannels();
+      console.log("채널 목록:", data);
       setChannels(data);
     } catch (err) {
+      console.error("채널 목록 조회 에러:", err);
       setError(
         err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
       );
@@ -35,6 +37,10 @@ const Subtitle = () => {
     setIsStreaming(true);
   };
 
+  const selectedChannelInfo = channels.find(
+    (channel) => channel.id === selectedChannel
+  );
+
   return (
     <div className="subtitle-page">
       <div className="subtitle-container">
@@ -51,7 +57,7 @@ const Subtitle = () => {
                 <option value="">채널 선택</option>
                 {channels.map((channel) => (
                   <option key={channel.id} value={channel.id}>
-                    {channel.name} ({channel.platform})
+                    {channel.channelName}
                   </option>
                 ))}
               </select>
@@ -76,7 +82,9 @@ const Subtitle = () => {
         <div className="subtitle-display">
           {isStreaming ? (
             <div className="subtitle-text">
-              실시간 자막이 여기에 표시됩니다...
+              {selectedChannelInfo
+                ? `${selectedChannelInfo.channelName}의 실시간 자막이 여기에 표시됩니다...`
+                : "실시간 자막이 여기에 표시됩니다..."}
             </div>
           ) : (
             <div className="subtitle-placeholder">
