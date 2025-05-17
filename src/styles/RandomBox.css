@@ -108,6 +108,8 @@
   max-width: 100%;
   overflow: hidden;
   transition: all 0.2s ease;
+  font-weight: 600;
+  filter: brightness(1.5);
 }
 
 .board-item:hover::after {

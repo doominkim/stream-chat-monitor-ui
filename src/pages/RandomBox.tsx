@@ -132,14 +132,18 @@ const RandomBox: React.FC = () => {
       const randomIndex = Math.floor(Math.random() * board.length);
       const selectedItem = board[randomIndex];
       if (!selectedItems.includes(selectedItem.id)) {
-        setSelectedItems((prev) => [...prev, selectedItem.id]);
         const userId = getRandomMockUsername();
         setParticipants((prev) => new Set(prev).add(userId));
-        board[randomIndex] = {
-          ...selectedItem,
-          userId,
-          color: getRandomColor(),
-        };
+        setSelectedItems((prev) => [...prev, selectedItem.id]);
+        setBoard((prev) => {
+          const newBoard = [...prev];
+          newBoard[randomIndex] = {
+            ...selectedItem,
+            userId,
+            color: getRandomColor(),
+          };
+          return newBoard;
+        });
       }
     }
   };
