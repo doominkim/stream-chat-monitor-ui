@@ -1334,12 +1334,37 @@ body.hide-header-footer main {
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
+  position: relative;
+  border: 2px solid transparent;
 }
 
 .channel-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  filter: grayscale(100%);
+}
+
+.channel-avatar.live img {
+  filter: none;
+}
+
+.channel-avatar.live {
+  background: linear-gradient(var(--bg-secondary), var(--bg-secondary))
+      padding-box,
+    linear-gradient(45deg, #00ffa3, #006f5f) border-box;
+}
+
+.channel-avatar .live-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  background-color: #ff0000;
+  border-radius: 50%;
+  border: 2px solid var(--bg-secondary);
+  animation: pulse 1.5s infinite;
 }
 
 .channel-details {
@@ -1353,13 +1378,24 @@ body.hide-header-footer main {
 
 .channel-name {
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 0.25rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+}
+
+.channel-category {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  letter-spacing: -0.5px;
 }
 
 .channel-meta {
@@ -1370,11 +1406,31 @@ body.hide-header-footer main {
 }
 
 .channel-status {
-  font-size: 0.75rem;
-  color: var(--primary-color);
-  padding: 0.125rem 0.5rem;
-  background-color: rgba(0, 255, 163, 0.1);
-  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #666;
+}
+
+.live-indicator {
+  width: 6px;
+  height: 6px;
+  background-color: #ff0000;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .channel-viewers {

@@ -62,7 +62,11 @@ const Subtitle = () => {
                   onClick={() => setSelectedChannel(channel.id)}
                 >
                   <div className="channel-info">
-                    <div className="channel-avatar">
+                    <div
+                      className={`channel-avatar ${
+                        channel.openLive ? "live" : ""
+                      }`}
+                    >
                       <img
                         src={channel.channelImageUrl || "/default-avatar.png"}
                         alt={channel.channelName}
@@ -70,11 +74,15 @@ const Subtitle = () => {
                     </div>
                     <div className="channel-details">
                       <div className="channel-name">{channel.channelName}</div>
+                      <div className="channel-category">
+                        {channel.channelLive?.liveCategory?.liveCategoryValue}
+                      </div>
                       <div className="channel-meta">
-                        <div className="channel-status">라이브</div>
-                        <div className="channel-viewers">
-                          • {channel.follower.toLocaleString()}
-                        </div>
+                        {channel.openLive && (
+                          <div className="channel-viewers">
+                            • {channel.follower.toLocaleString()}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
