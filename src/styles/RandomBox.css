@@ -112,20 +112,38 @@
   filter: brightness(1.5);
 }
 
-.board-item:hover::after {
+.board-item[data-tooltip]:hover::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: 100%;
+  bottom: 120%;
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--bg-secondary);
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  z-index: 10;
+  padding: 8px 12px;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  border-radius: 6px;
+  font-size: 14px;
   white-space: nowrap;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 1;
+  visibility: visible;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.board-item[data-tooltip]:hover::before {
+  content: "";
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 1;
+  visibility: visible;
 }
 
 .board-item:hover {

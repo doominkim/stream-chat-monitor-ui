@@ -9,6 +9,7 @@ interface BoardItem {
   userId?: string;
   borderColor?: string;
   color?: string;
+  message?: string;
 }
 
 interface Winner {
@@ -39,6 +40,8 @@ const RandomBox: React.FC = () => {
   const disappointmentSound = new Audio(
     "https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3"
   );
+  const [hoveredItem, setHoveredItem] = useState<BoardItem | null>(null);
+  const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
 
   const mockUsernames = [
     "SPECTACL2",
@@ -128,6 +131,10 @@ const RandomBox: React.FC = () => {
               const randomIndex = Math.floor(Math.random() * board.length);
               const selectedItem = board[randomIndex];
               if (!selectedItems.includes(selectedItem.id)) {
+                console.log("메시지 처리:", {
+                  nickname: msg.nickname,
+                  message: msg.message,
+                });
                 setParticipants((prev) => new Set(prev).add(msg.nickname));
                 setSelectedItems((prev) => [...prev, selectedItem.id]);
                 setBoard((prev) => {
@@ -136,7 +143,9 @@ const RandomBox: React.FC = () => {
                     ...selectedItem,
                     userId: msg.nickname,
                     color: getRandomColor(),
+                    message: msg.message,
                   };
+                  console.log("보드 아이템 업데이트:", newBoard[randomIndex]);
                   return newBoard;
                 });
               }
@@ -187,6 +196,7 @@ const RandomBox: React.FC = () => {
             ...selectedItem,
             userId,
             color: getRandomColor(),
+            message: "!뽑기",
           };
           return newBoard;
         });
@@ -439,9 +449,18 @@ const RandomBox: React.FC = () => {
                             ? "0 0 10px 5px rgba(0, 0, 0, 0.2)"
                             : "none",
                         }}
-                        data-tooltip={
-                          selectedItems.includes(item.id) ? item.userId : ""
-                        }
+                        onMouseEnter={(e) => {
+                          if (selectedItems.includes(item.id)) {
+                            const rect =
+                              e.currentTarget.getBoundingClientRect();
+                            setHoverPosition({
+                              x: rect.left + rect.width / 2,
+                              y: rect.top - 10,
+                            });
+                            setHoveredItem(item);
+                          }
+                        }}
+                        onMouseLeave={() => setHoveredItem(null)}
                       >
                         {selectedItems.includes(item.id) ? (
                           <span style={{ color: item.color }}>
@@ -455,6 +474,31 @@ const RandomBox: React.FC = () => {
                   </div>
                 </div>
               </div>
+              {hoveredItem && (
+                <div
+                  className="message-popover"
+                  style={{
+                    position: "fixed",
+                    top: hoverPosition.y,
+                    left: hoverPosition.x,
+                    transform: "translate(-50%, -100%)",
+                    backgroundColor: "rgba(0, 0, 0, 0.9)",
+                    color: "white",
+                    padding: "8px 12px",
+                    borderRadius: "6px",
+                    zIndex: 9999,
+                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
+                    pointerEvents: "none",
+                    fontSize: "14px",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <div style={{ fontWeight: "bold", marginBottom: "4px" }}>
+                    {hoveredItem.userId}
+                  </div>
+                  <div>{hoveredItem.message}</div>
+                </div>
+              )}
               {winners.length > 0 && (
                 <div className="winners-section">
                   <h2>당첨자 목록</h2>
