@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Channel,
   getChannels,
@@ -15,8 +15,7 @@ const Subtitle = () => {
   const [transcripts, setTranscripts] = useState<Transcript[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [offset, setOffset] = useState(0);
-  const observer = useRef<IntersectionObserver | null>(null);
+  const [limit, setLimit] = useState(20);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const subtitleDisplayRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -34,22 +33,13 @@ const Subtitle = () => {
         subtitleDisplayRef.current;
       const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
       setShowScrollButton(!isNearBottom);
+
+      // 스크롤이 맨 위에 도달했을 때만 limit 증가
+      if (scrollTop === 0 && hasMore && !loading) {
+        setLimit((prevLimit) => prevLimit + 20);
+      }
     }
   };
-
-  const lastTranscriptRef = useCallback(
-    (node: HTMLDivElement) => {
-      if (loading) return;
-      if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setOffset((prevOffset) => prevOffset + 20);
-        }
-      });
-      if (node) observer.current.observe(node);
-    },
-    [loading, hasMore]
-  );
 
   const fetchChannels = async () => {
     try {
@@ -69,7 +59,7 @@ const Subtitle = () => {
     if (!selectedChannel) return;
     try {
       setLoading(true);
-      const result = await getTranscripts(selectedChannel.uuid, offset);
+      const result = await getTranscripts(selectedChannel.uuid, 0, limit);
 
       // 새로운 자막만 추가
       setTranscripts((prev) => {
@@ -79,9 +69,34 @@ const Subtitle = () => {
         );
 
         if (newTranscripts.length > 0) {
+          // 스크롤이 맨 위에 있을 때는 이전 자막을 위에 추가
+          if (subtitleDisplayRef.current?.scrollTop === 0) {
+            const updatedTranscripts = [...newTranscripts, ...prev];
+            // 새로 추가된 컨텐츠의 높이만큼 스크롤을 아래로 내림
+            setTimeout(() => {
+              if (subtitleDisplayRef.current) {
+                const firstNewItem =
+                  subtitleDisplayRef.current.querySelector(".transcript-item");
+                if (firstNewItem) {
+                  subtitleDisplayRef.current.scrollTop =
+                    firstNewItem.getBoundingClientRect().height *
+                    newTranscripts.length;
+                }
+              }
+            }, 0);
+            return updatedTranscripts;
+          }
+
+          // 스크롤이 맨 아래에 가까울 때는 새 자막을 아래에 추가
           const updatedTranscripts = [...prev, ...newTranscripts];
-          // 새로운 자막이 추가되면 스크롤을 맨 아래로 이동
-          setTimeout(scrollToBottom, 0);
+          if (subtitleDisplayRef.current) {
+            const { scrollTop, scrollHeight, clientHeight } =
+              subtitleDisplayRef.current;
+            const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+            if (isNearBottom) {
+              setTimeout(scrollToBottom, 0);
+            }
+          }
           return updatedTranscripts;
         }
 
@@ -105,7 +120,7 @@ const Subtitle = () => {
 
     // 초기 데이터 로드
     setTranscripts([]); // 기존 자막 초기화
-    setOffset(0); // offset 초기화
+    setLimit(20); // limit 초기화
     fetchTranscripts();
 
     // 5초마다 새로운 데이터 로드
@@ -119,6 +134,12 @@ const Subtitle = () => {
       }
     };
   }, [selectedChannel]);
+
+  // limit이 변경될 때만 fetchTranscripts 호출
+  useEffect(() => {
+    if (!selectedChannel) return;
+    fetchTranscripts();
+  }, [limit]);
 
   const formatDate = (date: Date) => {
     return format(date, "yyyy년 MM월 dd일", { locale: ko });
@@ -208,16 +229,8 @@ const Subtitle = () => {
                     ([date, dateTranscripts]) => (
                       <div key={date} className="transcript-date-group">
                         <div className="transcript-date">{date}</div>
-                        {dateTranscripts.map((transcript, index) => (
-                          <div
-                            key={transcript.id}
-                            ref={
-                              index === dateTranscripts.length - 1
-                                ? lastTranscriptRef
-                                : null
-                            }
-                            className="transcript-item"
-                          >
+                        {dateTranscripts.map((transcript) => (
+                          <div key={transcript.id} className="transcript-item">
                             <div className="transcript-text">
                               {transcript.text}
                             </div>
