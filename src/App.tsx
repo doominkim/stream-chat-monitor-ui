@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import SearchUser from "./pages/SearchUser";
 import UserDetail from "./pages/UserDetail";
 import ChatHistory from "./pages/ChatHistory";
+import Subtitle from "./pages/Subtitle";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import "./App.css";
@@ -25,6 +26,7 @@ function App() {
             <Route path="/search" element={<SearchUser />} />
             <Route path="/user/:userId" element={<UserDetail />} />
             <Route path="/user/:userId/chat" element={<ChatHistory />} />
+            <Route path="/subtitle" element={<Subtitle />} />
             <Route path="/" element={<Navigate to="/search" replace />} />
           </Routes>
         </main>

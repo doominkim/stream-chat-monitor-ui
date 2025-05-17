@@ -1169,3 +1169,49 @@ body.hide-header-footer main {
   margin-top: 0;
   height: 100vh;
 }
+
+/* Subtitle page styles */
+.subtitle-page {
+  padding: 1rem;
+  margin-top: 3.5rem;
+  min-height: calc(100vh - 7.5rem);
+}
+
+.subtitle-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: var(--bg-primary);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+}
+
+.subtitle-controls {
+  margin: 2rem 0;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.subtitle-display {
+  min-height: 200px;
+  padding: 2rem;
+  background-color: var(--bg-secondary);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.subtitle-text {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  text-align: center;
+  line-height: 1.6;
+}
+
+.subtitle-placeholder {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}

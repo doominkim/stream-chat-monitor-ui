@@ -5,17 +5,12 @@ const Header = () => {
   const isSearchPage =
     location.pathname.startsWith("/search") ||
     location.pathname.startsWith("/user");
+  const isSubtitlePage = location.pathname.startsWith("/subtitle");
 
   return (
     <header>
       <nav>
         <div className="nav-container">
-          <div className="nav-logo">
-            <Link to="/" className="logo-text">
-              <span className="logo-text-primary">치지직</span>
-            </Link>
-          </div>
-
           <div className="nav-center">
             <Link
               to="/search"
@@ -23,13 +18,12 @@ const Header = () => {
             >
               유저 검색기
             </Link>
-          </div>
-
-          <div className="nav-menu">
-            <div className="nav-link">
-              <span className="nav-text">배돈</span>
-              <span className="nav-text">BOT</span>
-            </div>
+            <Link
+              to="/subtitle"
+              className={`dropdown-trigger ${isSubtitlePage ? "active" : ""}`}
+            >
+              AI 방송 자막
+            </Link>
           </div>
         </div>
       </nav>
