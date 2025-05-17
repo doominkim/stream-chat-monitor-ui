@@ -6,6 +6,7 @@ const Header = () => {
     location.pathname.startsWith("/search") ||
     location.pathname.startsWith("/user");
   const isSubtitlePage = location.pathname.startsWith("/subtitle");
+  const isRandomBoxPage = location.pathname.startsWith("/random-box");
 
   return (
     <header>
@@ -23,6 +24,12 @@ const Header = () => {
               className={`dropdown-trigger ${isSubtitlePage ? "active" : ""}`}
             >
               AI 방송 자막
+            </Link>
+            <Link
+              to="/random-box"
+              className={`dropdown-trigger ${isRandomBoxPage ? "active" : ""}`}
+            >
+              후원 랜덤박스
             </Link>
           </div>
         </div>
