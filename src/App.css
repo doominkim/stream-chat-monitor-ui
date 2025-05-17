@@ -1634,74 +1634,150 @@ body.hide-header-footer main {
   white-space: nowrap;
   transition: all 0.2s ease;
   font-size: 0.7rem;
-  cursor: help;
+  cursor: pointer;
   position: relative;
+  overflow: hidden;
 }
 
-.status-indicator:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-1px);
-}
-
-.status-indicator[title] {
-  position: relative;
-}
-
-.status-indicator[title]:hover::after {
-  content: attr(title);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 0.5rem;
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  font-size: 0.7rem;
-  white-space: pre-line;
-  border-radius: 4px;
-  z-index: 1000;
-  margin-bottom: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  min-width: 200px;
-  text-align: left;
-}
-
-.status-indicator[title]:hover::before {
+.status-indicator::before {
   content: "";
   position: absolute;
-  bottom: calc(100% - 5px);
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 5px;
-  border-style: solid;
-  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: currentColor;
+  opacity: 0.1;
+  transform: translateX(-100%);
+  transition: transform 0.2s ease;
 }
 
-.status-indicator.healthy::before {
-  background: #4caf50;
-  box-shadow: 0 0 4px #4caf50;
+.status-indicator:hover::before {
+  transform: translateX(0);
 }
 
-.status-indicator.degraded::before {
-  background: #ff9800;
-  box-shadow: 0 0 4px #ff9800;
+.status-indicator.up {
+  color: #4caf50;
 }
 
-.status-indicator.unhealthy::before {
-  background: #f44336;
-  box-shadow: 0 0 4px #f44336;
+.status-indicator.down {
+  color: #f44336;
+}
+
+.status-indicator.degraded {
+  color: #ff9800;
+}
+
+.status-indicator.healthy {
+  color: #4caf50;
+}
+
+.status-indicator.unhealthy {
+  color: #f44336;
 }
 
 .status-indicator.loading {
   opacity: 0.5;
-  animation: pulse 1.5s infinite;
 }
 
 .status-indicator.error {
   color: #f44336;
   background: rgba(244, 67, 54, 0.1);
+}
+
+.status-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  z-index: 1000;
+  min-width: 300px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.status-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+}
+
+.status-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.status-modal-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.status-modal-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  font-size: 1.25rem;
+  transition: color 0.2s;
+}
+
+.status-modal-close:hover {
+  color: var(--text-primary);
+}
+
+.status-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.status-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.status-detail-name {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+}
+
+.status-detail-value {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-detail-value.healthy {
+  color: #4caf50;
+}
+
+.status-detail-value.degraded {
+  color: #ff9800;
+}
+
+.status-detail-value.unhealthy {
+  color: #f44336;
 }
 
 .response-time {
@@ -1714,6 +1790,43 @@ body.hide-header-footer main {
 }
 
 @keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 4px rgba(76, 175, 80, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes error {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes loading {
   0% {
     opacity: 0.5;
   }
