@@ -203,7 +203,12 @@ const Subtitle = () => {
                       />
                     </div>
                     <div className="channel-details">
-                      <div className="channel-name">{channel.channelName}</div>
+                      <div className="channel-name">
+                        {channel.channelName}
+                        {channel.isEnabledAi && (
+                          <span className="ai-tag">AI 분석중</span>
+                        )}
+                      </div>
                       <div className="channel-category">
                         {channel.channelLive?.liveCategory?.liveCategoryValue}
                       </div>
