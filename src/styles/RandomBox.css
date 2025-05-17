@@ -38,44 +38,237 @@
 
 .box-content {
   background-color: #2a2a2a;
-  padding: 2rem;
+  padding: 0;
   border-radius: 8px;
+}
+
+.box-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.box-header h1 {
+  color: var(--primary-color);
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.box-description {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.box-warning {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.board-container {
+  margin-top: 1rem;
+  padding: 0;
+  background-color: var(--bg-primary);
+  border-radius: 1rem;
+  border: 1px solid var(--border-color);
+}
+
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.board-item {
+  aspect-ratio: 1;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  font-size: 0.8rem;
+  word-wrap: break-word;
+}
+
+.board-item:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.board-item.selected {
+  border-color: var(--primary-color);
+  background-color: rgba(0, 255, 163, 0.1);
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.board-item.revealed {
+  background-color: var(--bg-primary);
+}
+
+.board-item.winner-animate {
+  animation: winner-blink 1s steps(2, start) 4, winner-scale 0.5s ease-in-out 1;
+  border: 2px solid #ffd700;
+  background-color: #fffbe6;
+  box-shadow: 0 0 20px 5px #ffd70099;
+  z-index: 2;
+}
+
+@keyframes winner-blink {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(2);
+  }
+}
+
+@keyframes winner-scale {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.item-question {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.item-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.item-price {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.item-count {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.item-count::after {
+  content: "개";
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.box-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.amount-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.amount-control label {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.amount-control input {
+  width: 120px;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.amount-control span {
+  color: var(--text-secondary);
 }
 
 .open-box-btn {
-  padding: 1rem 2rem;
-  font-size: 1.2rem;
-  background-color: #4caf50;
-  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--primary-color);
+  color: var(--bg-primary);
+  font-weight: 600;
   border: none;
-  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.2s ease;
 }
 
 .open-box-btn:hover:not(:disabled) {
-  background-color: #45a049;
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
 }
 
 .open-box-btn:disabled {
-  background-color: #333;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .result-container {
-  color: #fff;
+  text-align: center;
+  padding: 2rem;
+  background-color: var(--bg-primary);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
 }
 
 .result-container h2 {
+  color: var(--primary-color);
   margin-bottom: 1rem;
+}
+
+.result-container p {
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
 }
 
 .result-container button {
   margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #2196f3;
-  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--primary-color);
+  color: var(--bg-primary);
+  font-weight: 600;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.result-container button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
 }
