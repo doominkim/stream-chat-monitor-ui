@@ -1483,7 +1483,6 @@ body.hide-header-footer main {
   padding: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-bottom: 3px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -1551,7 +1550,6 @@ body.hide-header-footer main {
   font-size: 0.875rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 0.25rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

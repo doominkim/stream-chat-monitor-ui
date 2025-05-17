@@ -1,0 +1,102 @@
+.channel-navigator {
+  background-color: #1a1a1a;
+  border-right: 1px solid #2a2a2a;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.channel-navigator-header {
+  padding: 1rem;
+  border-bottom: 1px solid #2a2a2a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.channel-navigator-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.channel-navigator-count {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.channel-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.channel-card {
+  background-color: #2a2a2a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.channel-card:hover {
+  background-color: #333;
+}
+
+.channel-card.selected {
+  background-color: #3a3a3a;
+  border: 1px solid #4a4a4a;
+}
+
+.channel-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.channel-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.channel-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.channel-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.channel-name {
+  font-weight: 500;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.channel-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.channel-category {
+  color: #888;
+  white-space: nowrap;
+}
+
+.channel-followers {
+  white-space: nowrap;
+}

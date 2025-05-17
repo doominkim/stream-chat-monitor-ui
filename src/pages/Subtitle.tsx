@@ -1,17 +1,20 @@
 import { useState, useEffect, useRef } from "react";
-import {
-  Channel,
-  getChannels,
-  getTranscripts,
-  Transcript,
-} from "../api/channel";
+import { getTranscripts, Transcript } from "../api/channel";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
+import ChannelNavigator from "../components/ChannelNavigator";
+
+interface Channel {
+  id: string;
+  name: string;
+  logo: string;
+  openLive: boolean;
+  follower: number;
+  gameCategory?: string;
+}
 
 const Subtitle = () => {
-  const [channels, setChannels] = useState<Channel[]>([]);
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [transcripts, setTranscripts] = useState<Transcript[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -41,25 +44,11 @@ const Subtitle = () => {
     }
   };
 
-  const fetchChannels = async () => {
-    try {
-      setError(null);
-      const data = await getChannels();
-      console.log("채널 목록:", data);
-      setChannels(data);
-    } catch (err) {
-      console.error("채널 목록 조회 에러:", err);
-      setError(
-        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
-      );
-    }
-  };
-
   const fetchTranscripts = async () => {
     if (!selectedChannel) return;
     try {
       setLoading(true);
-      const result = await getTranscripts(selectedChannel.uuid, 0, limit);
+      const result = await getTranscripts(selectedChannel.id, 0, limit);
 
       // 새로운 자막만 추가
       setTranscripts((prev) => {
@@ -112,10 +101,6 @@ const Subtitle = () => {
   };
 
   useEffect(() => {
-    fetchChannels();
-  }, []);
-
-  useEffect(() => {
     if (!selectedChannel) return;
 
     // 초기 데이터 로드
@@ -165,107 +150,53 @@ const Subtitle = () => {
     return groups;
   };
 
-  const handleChannelSelect = (channel: Channel) => {
-    setSelectedChannel(channel);
-    // 채널 선택 후 스크롤을 맨 아래로 이동
-    setTimeout(scrollToBottom, 100);
-  };
-
   return (
     <div className="subtitle-page">
       <div className="subtitle-layout">
         <div className="subtitle-sidebar">
-          <div className="channel-navigator">
-            <div className="channel-navigator-header">
-              <div className="channel-navigator-title">채널 선택</div>
-              <div className="channel-navigator-count">
-                {channels.length}개의 채널
-              </div>
-            </div>
-            <div className="channel-list">
-              {channels.map((channel) => (
-                <div
-                  key={channel.id}
-                  className={`channel-card ${
-                    selectedChannel?.id === channel.id ? "selected" : ""
-                  }`}
-                  onClick={() => handleChannelSelect(channel)}
-                >
-                  <div className="channel-info">
-                    <div
-                      className={`channel-avatar ${
-                        channel.openLive ? "live" : ""
-                      }`}
-                    >
-                      <img
-                        src={channel.channelImageUrl || "/default-avatar.png"}
-                        alt={channel.channelName}
-                      />
-                    </div>
-                    <div className="channel-details">
-                      <div className="channel-name">
-                        {channel.channelName}
-                        {channel.isEnabledAi && (
-                          <span className="ai-tag">AI 분석중</span>
-                        )}
-                      </div>
-                      <div className="channel-category">
-                        {channel.channelLive?.liveCategory?.liveCategoryValue}
-                      </div>
-                      <div className="channel-meta">
-                        {channel.openLive && (
-                          <div className="channel-viewers">
-                            • {channel.follower.toLocaleString()}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ChannelNavigator
+            selectedChannel={selectedChannel}
+            onChannelSelect={(channel) => {
+              setSelectedChannel(channel);
+              setTimeout(scrollToBottom, 100);
+            }}
+          />
         </div>
         <div className="subtitle-main">
           <div className="subtitle-container">
-            {error && <div className="error-message">{error}</div>}
             <div
               className="subtitle-display"
               ref={subtitleDisplayRef}
               onScroll={handleScroll}
             >
-              {selectedChannel ? (
-                <>
-                  {Object.entries(groupTranscriptsByDate(transcripts)).map(
-                    ([date, dateTranscripts]) => (
-                      <div key={date} className="transcript-date-group">
-                        <div className="transcript-date">{date}</div>
-                        {dateTranscripts.map((transcript) => (
-                          <div key={transcript.id} className="transcript-item">
-                            <div className="transcript-text">
-                              {transcript.text}
-                            </div>
-                            <div className="transcript-time">
-                              {formatTime(new Date(transcript.createdAt))}
-                            </div>
-                          </div>
-                        ))}
+              {Object.entries(groupTranscriptsByDate(transcripts)).map(
+                ([date, dateTranscripts]) => (
+                  <div key={date} className="transcript-date-group">
+                    <div className="transcript-date">{date}</div>
+                    {dateTranscripts.map((transcript) => (
+                      <div key={transcript.id} className="transcript-item">
+                        <div className="transcript-text">{transcript.text}</div>
+                        <div className="transcript-time">
+                          {formatTime(new Date(transcript.createdAt))}
+                        </div>
                       </div>
-                    )
-                  )}
-                  <button
-                    className={`scroll-to-bottom ${
-                      showScrollButton ? "visible" : ""
-                    }`}
-                    onClick={scrollToBottom}
-                    title="맨 아래로"
-                  >
-                    ↓
-                  </button>
-                </>
-              ) : (
+                    ))}
+                  </div>
+                )
+              )}
+              {loading && <div className="loading">로딩 중...</div>}
+              {!selectedChannel && (
                 <div className="subtitle-placeholder">텅...</div>
               )}
+              <button
+                className={`scroll-to-bottom ${
+                  showScrollButton ? "visible" : ""
+                }`}
+                onClick={scrollToBottom}
+                title="맨 아래로"
+              >
+                ↓
+              </button>
             </div>
           </div>
         </div>

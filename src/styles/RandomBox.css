@@ -1,10 +1,45 @@
-.random-box-container {
+.subtitle-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.subtitle-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.subtitle-sidebar {
+  width: 20%;
+  background-color: #1a1a1a;
+  border-right: 1px solid #2a2a2a;
+  display: flex;
+  flex-direction: column;
+}
+
+.subtitle-content {
+  width: 80%;
+  overflow-y: auto;
+  background-color: #1a1a1a;
   padding: 2rem;
+}
+
+.random-box-container {
+  max-width: 800px;
+  margin: 0 auto;
   text-align: center;
 }
 
+.random-box-container h1 {
+  color: #fff;
+  margin-bottom: 2rem;
+}
+
 .box-content {
-  margin-top: 2rem;
+  background-color: #2a2a2a;
+  padding: 2rem;
+  border-radius: 8px;
 }
 
 .open-box-btn {
@@ -18,15 +53,21 @@
   transition: background-color 0.3s;
 }
 
-.open-box-btn:hover {
+.open-box-btn:hover:not(:disabled) {
   background-color: #45a049;
 }
 
+.open-box-btn:disabled {
+  background-color: #333;
+  cursor: not-allowed;
+}
+
 .result-container {
-  margin-top: 2rem;
-  padding: 2rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  color: #fff;
+}
+
+.result-container h2 {
+  margin-bottom: 1rem;
 }
 
 .result-container button {
