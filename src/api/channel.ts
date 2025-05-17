@@ -37,3 +37,35 @@ export const getChannels = async (): Promise<Channel[]> => {
     throw error;
   }
 };
+
+export const getChannel = async (channelId: string): Promise<Channel> => {
+  try {
+    const response = await apiClient.get(`/channel/${channelId}`);
+    return response.data;
+  } catch (error) {
+    console.error("채널 조회 실패:", error);
+    throw error;
+  }
+};
+
+export interface Transcript {
+  id: number;
+  createdAt: string;
+  text: string;
+}
+
+export const getTranscripts = async (
+  channelId: string,
+  offset: number,
+  limit: number = 20
+): Promise<{ items: Transcript[]; total: number; hasMore: boolean }> => {
+  try {
+    const response = await apiClient.get(
+      `/channel/${channelId}/transcript?offset=${offset}&limit=${limit}&sort=ASC`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("자막 조회 실패:", error);
+    throw error;
+  }
+};

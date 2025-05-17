@@ -1,12 +1,47 @@
-import { useState, useEffect } from "react";
-import { Channel, getChannels } from "../api/channel";
+import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  Channel,
+  getChannels,
+  getTranscripts,
+  Transcript,
+} from "../api/channel";
+import { formatDistanceToNow } from "date-fns";
+import { ko } from "date-fns/locale";
 
 const Subtitle = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [channels, setChannels] = useState<Channel[]>([]);
-  const [selectedChannel, setSelectedChannel] = useState<number | null>(null);
+  const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [transcripts, setTranscripts] = useState<Transcript[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [offset, setOffset] = useState(0);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const subtitleDisplayRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    if (subtitleDisplayRef.current) {
+      subtitleDisplayRef.current.scrollTop =
+        subtitleDisplayRef.current.scrollHeight;
+    }
+  };
+
+  const lastTranscriptRef = useCallback(
+    (node: HTMLDivElement) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setOffset((prevOffset) => prevOffset + 20);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
 
   const fetchChannels = async () => {
     try {
@@ -25,9 +60,58 @@ const Subtitle = () => {
     }
   };
 
+  const fetchTranscripts = async () => {
+    if (!selectedChannel) return;
+    try {
+      setLoading(true);
+      const result = await getTranscripts(selectedChannel.uuid, offset);
+
+      // 새로운 자막만 추가
+      setTranscripts((prev) => {
+        const existingIds = new Set(prev.map((t) => t.id));
+        const newTranscripts = result.items.filter(
+          (t) => !existingIds.has(t.id)
+        );
+
+        if (newTranscripts.length > 0) {
+          const updatedTranscripts = [...prev, ...newTranscripts];
+          // 새로운 자막이 추가되면 스크롤을 맨 아래로 이동
+          setTimeout(scrollToBottom, 0);
+          return updatedTranscripts;
+        }
+
+        return prev;
+      });
+
+      setHasMore(result.hasMore);
+    } catch (error) {
+      console.error("Failed to fetch transcripts:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchChannels();
   }, []);
+
+  useEffect(() => {
+    if (!selectedChannel || !isStreaming) return;
+
+    // 초기 데이터 로드
+    fetchTranscripts();
+
+    // 5초마다 새로운 데이터 로드
+    intervalRef.current = setInterval(() => {
+      fetchTranscripts();
+    }, 5000);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [selectedChannel, isStreaming]);
 
   const handleStartStreaming = () => {
     if (!selectedChannel) {
@@ -35,11 +119,16 @@ const Subtitle = () => {
       return;
     }
     setIsStreaming(true);
+    setTranscripts([]); // 자막 시작 시 기존 자막 초기화
+    setOffset(0); // offset 초기화
   };
 
-  const selectedChannelInfo = channels.find(
-    (channel) => channel.id === selectedChannel
-  );
+  const handleStopStreaming = () => {
+    setIsStreaming(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+  };
 
   return (
     <div className="subtitle-page">
@@ -57,9 +146,9 @@ const Subtitle = () => {
                 <div
                   key={channel.id}
                   className={`channel-card ${
-                    selectedChannel === channel.id ? "selected" : ""
+                    selectedChannel?.id === channel.id ? "selected" : ""
                   }`}
-                  onClick={() => setSelectedChannel(channel.id)}
+                  onClick={() => setSelectedChannel(channel)}
                 >
                   <div className="channel-info">
                     <div
@@ -106,20 +195,37 @@ const Subtitle = () => {
               ) : (
                 <button
                   className="button button-secondary"
-                  onClick={() => setIsStreaming(false)}
+                  onClick={handleStopStreaming}
                 >
                   자막 중지
                 </button>
               )}
             </div>
             {error && <div className="error-message">{error}</div>}
-            <div className="subtitle-display">
+            <div className="subtitle-display" ref={subtitleDisplayRef}>
               {isStreaming ? (
-                <div className="subtitle-text">
-                  {selectedChannelInfo
-                    ? `${selectedChannelInfo.channelName}의 실시간 자막이 여기에 표시됩니다...`
-                    : "실시간 자막이 여기에 표시됩니다..."}
-                </div>
+                <>
+                  {transcripts.map((transcript, index) => (
+                    <div
+                      key={transcript.id}
+                      ref={
+                        index === transcripts.length - 1
+                          ? lastTranscriptRef
+                          : null
+                      }
+                      className="transcript-item"
+                    >
+                      <div className="transcript-text">{transcript.text}</div>
+                      <div className="transcript-time">
+                        {formatDistanceToNow(new Date(transcript.createdAt), {
+                          addSuffix: true,
+                          locale: ko,
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                  {loading && <div className="loading">로딩 중...</div>}
+                </>
               ) : (
                 <div className="subtitle-placeholder">
                   채널을 선택하고 자막 시작 버튼을 눌러주세요
