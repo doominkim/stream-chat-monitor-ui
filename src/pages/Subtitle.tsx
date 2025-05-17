@@ -5,7 +5,7 @@ import {
   getTranscripts,
   Transcript,
 } from "../api/channel";
-import { formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 
 const Subtitle = () => {
@@ -120,6 +120,30 @@ const Subtitle = () => {
     };
   }, [selectedChannel]);
 
+  const formatDate = (date: Date) => {
+    return format(date, "yyyy년 MM월 dd일", { locale: ko });
+  };
+
+  const formatTime = (date: Date) => {
+    return format(date, "HH:mm:ss", { locale: ko });
+  };
+
+  const groupTranscriptsByDate = (transcripts: Transcript[]) => {
+    const groups: { [key: string]: Transcript[] } = {};
+
+    transcripts.forEach((transcript) => {
+      const date = new Date(transcript.createdAt);
+      const dateKey = formatDate(date);
+
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+      groups[dateKey].push(transcript);
+    });
+
+    return groups;
+  };
+
   return (
     <div className="subtitle-page">
       <div className="subtitle-layout">
@@ -180,26 +204,31 @@ const Subtitle = () => {
             >
               {selectedChannel ? (
                 <>
-                  {transcripts.map((transcript, index) => (
-                    <div
-                      key={transcript.id}
-                      ref={
-                        index === transcripts.length - 1
-                          ? lastTranscriptRef
-                          : null
-                      }
-                      className="transcript-item"
-                    >
-                      <div className="transcript-text">{transcript.text}</div>
-                      <div className="transcript-time">
-                        {formatDistanceToNow(new Date(transcript.createdAt), {
-                          addSuffix: true,
-                          locale: ko,
-                        })}
+                  {Object.entries(groupTranscriptsByDate(transcripts)).map(
+                    ([date, dateTranscripts]) => (
+                      <div key={date} className="transcript-date-group">
+                        <div className="transcript-date">{date}</div>
+                        {dateTranscripts.map((transcript, index) => (
+                          <div
+                            key={transcript.id}
+                            ref={
+                              index === dateTranscripts.length - 1
+                                ? lastTranscriptRef
+                                : null
+                            }
+                            className="transcript-item"
+                          >
+                            <div className="transcript-text">
+                              {transcript.text}
+                            </div>
+                            <div className="transcript-time">
+                              {formatTime(new Date(transcript.createdAt))}
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                  ))}
-                  {loading && <div className="loading">로딩 중...</div>}
+                    )
+                  )}
                   <button
                     className={`scroll-to-bottom ${
                       showScrollButton ? "visible" : ""
@@ -211,7 +240,7 @@ const Subtitle = () => {
                   </button>
                 </>
               ) : (
-                <div className="subtitle-placeholder">채널을 선택해주세요</div>
+                <div className="subtitle-placeholder">텅...</div>
               )}
             </div>
           </div>

@@ -680,10 +680,49 @@ footer .footer-content {
 }
 
 .loading {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
   text-align: center;
-  padding: 2rem;
-  font-size: 1.1rem;
-  color: var(--text-primary);
+  width: 100%;
+  padding: 1rem;
+  background-color: rgba(42, 42, 42, 0.5);
+  border-radius: 8px;
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(58, 58, 58, 0.5);
+  animation: pulse 1.5s infinite;
+}
+
+.loading::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--text-secondary);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
 }
 
 .loading-more {
@@ -1269,6 +1308,32 @@ body.hide-header-footer main {
   position: relative;
 }
 
+.transcript-date-group {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.transcript-date {
+  color: var(--primary-color);
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  background-color: rgba(0, 255, 163, 0.1);
+  border-radius: 8px;
+  margin: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border: 1px solid rgba(0, 255, 163, 0.2);
+  text-align: center;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.transcript-date-group:first-child .transcript-date {
+  margin-top: 0;
+}
+
 .transcript-item {
   background-color: #2a2a2a;
   border-radius: 8px;
@@ -1301,14 +1366,21 @@ body.hide-header-footer main {
 }
 
 .subtitle-placeholder {
-  color: #666;
-  font-size: 1rem;
+  color: var(--text-secondary);
+  font-size: 4rem;
+  font-weight: 700;
   text-align: center;
   width: 100%;
-  padding: 2rem;
+  padding: 4rem;
   background-color: #2a2a2a;
   border-radius: 8px;
   border: 1px dashed #3a3a3a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  letter-spacing: -2px;
+  opacity: 0.5;
 }
 
 .loading {
