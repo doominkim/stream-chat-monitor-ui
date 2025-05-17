@@ -25,6 +25,20 @@ const RandomBox: React.FC = () => {
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [participants, setParticipants] = useState<Set<string>>(new Set());
   const [winner, setWinner] = useState<number | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [showWinnerMessage, setShowWinnerMessage] = useState(false);
+  const [winners, setWinners] = useState<
+    Array<{ id: number; userId: string; color: string }>
+  >([]);
+  const partySound = new Audio(
+    "https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3"
+  );
+  const failSound = new Audio(
+    "https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"
+  );
+  const disappointmentSound = new Audio(
+    "https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3"
+  );
 
   const mockUsernames = [
     "SPECTACL2",
@@ -125,13 +139,63 @@ const RandomBox: React.FC = () => {
   };
 
   const handleShowResult = () => {
-    if (selectedItems.length > 0) {
-      const randomIndex = Math.floor(Math.random() * selectedItems.length);
-      const winningItem = selectedItems[randomIndex];
-      setWinner(winningItem);
+    if (board.length > 0) {
+      const randomIndex = Math.floor(Math.random() * board.length);
+      const winningItem = board[randomIndex];
+      setWinner(winningItem.id);
+      setShowWinnerMessage(true);
+
+      // 당첨된 경우와 꽝인 경우 다른 효과음 재생
+      if (selectedItems.includes(winningItem.id)) {
+        setShowConfetti(true);
+        partySound.play().catch((err) => console.log("소리 재생 실패:", err));
+
+        // 당첨자 목록에 추가
+        const winnerInfo = board.find((item) => item.id === winningItem.id);
+        if (winnerInfo && winnerInfo.userId && winnerInfo.color) {
+          setWinners((prev) => [
+            ...prev,
+            {
+              id: winnerInfo.id,
+              userId: winnerInfo.userId,
+              color: winnerInfo.color,
+            },
+          ]);
+        }
+
+        // 3초 후 폭죽 숨기기
+        setTimeout(() => {
+          setShowConfetti(false);
+        }, 3000);
+      } else {
+        disappointmentSound
+          .play()
+          .catch((err) => console.log("소리 재생 실패:", err));
+      }
+
+      // 5초 후 메시지 숨기기
+      setTimeout(() => {
+        setShowWinnerMessage(false);
+      }, 5000);
     } else {
       alert("선택된 아이템이 없습니다.");
     }
+  };
+
+  const handleReset = () => {
+    setSelectedItems([]);
+    setParticipants(new Set());
+    setWinner(null);
+    setShowConfetti(false);
+    setShowWinnerMessage(false);
+    setWinners([]); // 당첨자 목록도 초기화
+    const initialBoard: BoardItem[] = Array.from(
+      { length: 100 },
+      (_, index) => ({
+        id: index + 1,
+      })
+    );
+    setBoard(initialBoard);
   };
 
   return (
@@ -150,14 +214,42 @@ const RandomBox: React.FC = () => {
               <p className="box-warning">
                 ⚠️ 새로고침 시 모든 내역이 사라집니다
               </p>
-              <button onClick={handleMockDraw} className="mock-draw-btn">
-                !뽑기
-              </button>
-              <button onClick={handleShowResult} className="show-result-btn">
-                결과보기
-              </button>
+              <div className="button-group">
+                <button onClick={handleMockDraw} className="mock-draw-btn">
+                  !뽑기
+                </button>
+                <button onClick={handleShowResult} className="show-result-btn">
+                  결과보기
+                </button>
+                <button onClick={handleReset} className="reset-btn">
+                  다시하기
+                </button>
+              </div>
             </div>
-            {winner && <div className="winner-display">당첨자: {winner}</div>}
+            {showWinnerMessage && winner && (
+              <div className="winner-message">
+                {selectedItems.includes(winner)
+                  ? `${
+                      board.find((item) => item.id === winner)?.userId
+                    }님 축하합니다!`
+                  : "꽝! 다음 기회에..."}
+              </div>
+            )}
+            {showConfetti && (
+              <div className="confetti-container">
+                {Array.from({ length: 150 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="confetti"
+                    style={{
+                      left: `${Math.random() * 100}vw`,
+                      animationDuration: `${0.5 + Math.random() * 0.5}s`,
+                      animationDelay: `${Math.random() * 0.2}s`,
+                    }}
+                  />
+                ))}
+              </div>
+            )}
             <div className="box-content">
               <div className="board-container">
                 <div className="board-grid">
@@ -172,6 +264,9 @@ const RandomBox: React.FC = () => {
                           ? "0 0 10px 5px rgba(0, 0, 0, 0.2)"
                           : "none",
                       }}
+                      data-tooltip={
+                        selectedItems.includes(item.id) ? item.userId : ""
+                      }
                     >
                       {selectedItems.includes(item.id) ? (
                         <span style={{ color: item.color }}>{item.userId}</span>
@@ -183,6 +278,24 @@ const RandomBox: React.FC = () => {
                 </div>
               </div>
             </div>
+            {winners.length > 0 && (
+              <div className="winners-section">
+                <h2>당첨자 목록</h2>
+                <div className="winners-list">
+                  {winners.map((winner, index) => (
+                    <div key={winner.id} className="winner-item">
+                      <span className="winner-number">{index + 1}</span>
+                      <span
+                        className="winner-name"
+                        style={{ color: winner.color }}
+                      >
+                        {winner.userId}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

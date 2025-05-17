@@ -101,6 +101,29 @@
   overflow: hidden;
   font-size: 0.8rem;
   word-wrap: break-word;
+  word-break: break-all;
+}
+
+.board-item span {
+  max-width: 100%;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.board-item:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--bg-secondary);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  white-space: nowrap;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
 }
 
 .board-item:hover {
@@ -120,32 +143,18 @@
 }
 
 .board-item.winner-animate {
-  animation: winner-blink 1s steps(2, start) 4, winner-scale 0.5s ease-in-out 1;
-  border: 2px solid #ffd700;
-  background-color: #fffbe6;
-  box-shadow: 0 0 20px 5px #ffd70099;
+  animation: winner-blink 1s steps(2, start) 4;
+  border: 2px dashed #ffd700;
   z-index: 2;
 }
 
 @keyframes winner-blink {
   0%,
   100% {
-    filter: brightness(1);
+    border-color: #ffd700;
   }
   50% {
-    filter: brightness(2);
-  }
-}
-
-@keyframes winner-scale {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.15);
-  }
-  100% {
-    transform: scale(1);
+    border-color: transparent;
   }
 }
 
@@ -271,4 +280,171 @@
 .result-container button:hover {
   background-color: var(--primary-hover);
   transform: translateY(-2px);
+}
+
+.winner-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #ffd700;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  z-index: 1000;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.confetti {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background-color: #ffd700;
+  animation: confetti-burst 1s ease-out forwards;
+  z-index: 1000;
+  opacity: 0;
+}
+
+.confetti:nth-child(2n) {
+  background-color: #ff6b6b;
+}
+
+.confetti:nth-child(3n) {
+  background-color: #4ecdc4;
+}
+
+.confetti:nth-child(4n) {
+  background-color: #45b7d1;
+}
+
+.confetti:nth-child(5n) {
+  background-color: #96ceb4;
+}
+
+@keyframes confetti-burst {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  30% {
+    transform: translateY(50vh) scale(1.5);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+}
+
+.confetti-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.mock-draw-btn,
+.show-result-btn,
+.reset-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mock-draw-btn {
+  background-color: var(--primary-color);
+  color: var(--bg-primary);
+}
+
+.show-result-btn {
+  background-color: #ffd700;
+  color: #000;
+  font-size: 1.1rem;
+  padding: 0.85rem 2rem;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.reset-btn {
+  background-color: #ff6b6b;
+  color: white;
+}
+
+.mock-draw-btn:hover,
+.show-result-btn:hover,
+.reset-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.show-result-btn:hover {
+  background-color: #ffed4a;
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+}
+
+.winners-section {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: var(--bg-secondary);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.winners-section h2 {
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.winners-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.winner-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem;
+  background-color: var(--bg-primary);
+  border-radius: 0.25rem;
+}
+
+.winner-number {
+  color: var(--text-secondary);
+  font-weight: 600;
+  min-width: 2rem;
+}
+
+.winner-name {
+  font-weight: 500;
 }
