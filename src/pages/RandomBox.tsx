@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import "../styles/RandomBox.css";
 import ChannelNavigator from "../components/ChannelNavigator";
 import { getChatMessages, ChatType } from "../api/chat";
@@ -18,6 +18,43 @@ interface Winner {
   userId: string;
   color: string;
 }
+
+interface BoardItemProps {
+  item: BoardItem;
+  isSelected: boolean;
+  isWinner: boolean;
+  onMouseEnter: (e: React.MouseEvent<HTMLDivElement>, item: BoardItem) => void;
+  onMouseLeave: (item: BoardItem) => void;
+}
+
+const BoardItemComponent = memo(
+  ({
+    item,
+    isSelected,
+    isWinner,
+    onMouseEnter,
+    onMouseLeave,
+  }: BoardItemProps) => {
+    return (
+      <div
+        className={`board-item ${isSelected ? "selected" : ""} ${
+          isWinner ? "winner-animate" : ""
+        }`}
+        style={{
+          boxShadow: isSelected ? "0 0 10px 5px rgba(0, 0, 0, 0.2)" : "none",
+        }}
+        onMouseEnter={(e) => onMouseEnter(e, item)}
+        onMouseLeave={() => onMouseLeave(item)}
+      >
+        {isSelected ? (
+          <span style={{ color: item.color }}>{item.userId}</span>
+        ) : (
+          ""
+        )}
+      </div>
+    );
+  }
+);
 
 const RandomBox: React.FC = () => {
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
@@ -257,6 +294,29 @@ const RandomBox: React.FC = () => {
     setBoard(initialBoard);
   };
 
+  const handleMouseEnter = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>, item: BoardItem) => {
+      if (!selectedItems.includes(item.id) || hoveredItem) return;
+
+      const rect = e.currentTarget.getBoundingClientRect();
+      setHoverPosition({
+        x: rect.left + rect.width / 2,
+        y: rect.top - 10,
+      });
+      setHoveredItem(item);
+    },
+    [selectedItems, hoveredItem]
+  );
+
+  const handleMouseLeave = useCallback(
+    (item: BoardItem) => {
+      if (hoveredItem?.id === item.id) {
+        setHoveredItem(null);
+      }
+    },
+    [hoveredItem]
+  );
+
   return (
     <div className="subtitle-page">
       <div className="subtitle-layout">
@@ -459,37 +519,14 @@ const RandomBox: React.FC = () => {
                 <div className="board-container">
                   <div className="board-grid">
                     {board.map((item) => (
-                      <div
+                      <BoardItemComponent
                         key={item.id}
-                        className={`board-item ${
-                          selectedItems.includes(item.id) ? "selected" : ""
-                        } ${winner === item.id ? "winner-animate" : ""}`}
-                        style={{
-                          boxShadow: selectedItems.includes(item.id)
-                            ? "0 0 10px 5px rgba(0, 0, 0, 0.2)"
-                            : "none",
-                        }}
-                        onMouseEnter={(e) => {
-                          if (selectedItems.includes(item.id)) {
-                            const rect =
-                              e.currentTarget.getBoundingClientRect();
-                            setHoverPosition({
-                              x: rect.left + rect.width / 2,
-                              y: rect.top - 10,
-                            });
-                            setHoveredItem(item);
-                          }
-                        }}
-                        onMouseLeave={() => setHoveredItem(null)}
-                      >
-                        {selectedItems.includes(item.id) ? (
-                          <span style={{ color: item.color }}>
-                            {item.userId}
-                          </span>
-                        ) : (
-                          ""
-                        )}
-                      </div>
+                        item={item}
+                        isSelected={selectedItems.includes(item.id)}
+                        isWinner={winner === item.id}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                      />
                     ))}
                   </div>
                 </div>
