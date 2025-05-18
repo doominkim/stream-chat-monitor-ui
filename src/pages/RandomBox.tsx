@@ -3,6 +3,7 @@ import "../styles/RandomBox.css";
 import ChannelNavigator from "../components/ChannelNavigator";
 import { getChatMessages, ChatType } from "../api/chat";
 import { Channel } from "../api/channel";
+import { FaDice, FaRedo, FaHome } from "react-icons/fa";
 
 interface BoardItem {
   id: number;
@@ -31,6 +32,10 @@ const RandomBox: React.FC = () => {
   const [collectionType, setCollectionType] = useState<"chat" | "donation">(
     "chat"
   );
+  const [chatCollectionMode, setChatCollectionMode] = useState<
+    "all" | "command"
+  >("all");
+  const [chatCommand, setChatCommand] = useState<string>("!뽑기");
   const [donationAmount, setDonationAmount] = useState<number>(1000);
   const [isCustomAmount, setIsCustomAmount] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
@@ -43,56 +48,7 @@ const RandomBox: React.FC = () => {
   const [hoveredItem, setHoveredItem] = useState<BoardItem | null>(null);
   const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
 
-  const mockUsernames = [
-    "SPECTACL2",
-    "MayBeee",
-    "귀요미미미",
-    "구로냥",
-    "답도 없는 마녀 9190",
-    "럭키가이 쪼렙 3050",
-    "럭키가이 초보 2799",
-    "배부른도니",
-    "복복강",
-    "세틀로직",
-    "썬두리",
-    "아프란",
-    "알다가도 모르겠다",
-    "에뜨모후",
-    "오목눈이1",
-    "전패의 엘프 2007",
-    "정유호",
-    "쟉이야",
-    "카타리나클라에스",
-    "코로먹는설탕",
-    "포포토",
-    "펑크CM",
-    "하양바람",
-    "화수월럭키가이 중렙 3340",
-    "귀염둥이미미",
-    "배터진도니",
-    "쫄보강",
-    "정유재",
-    "답없는 기사 7777",
-    "텅텅텅",
-    "전패의 마법사 1999",
-    "펑펑PM",
-    "사후르왕자",
-    "포포링",
-    "썬디루",
-    "에뜨모모",
-    "쟈기야",
-    "혼자노는힐러",
-    "용잡는설탕",
-    "하양연기",
-    "쏘쏘월",
-  ];
-
-  const getRandomMockUsername = () => {
-    return mockUsernames[Math.floor(Math.random() * mockUsernames.length)];
-  };
-
   useEffect(() => {
-    // 10x10 보드 초기화
     const initialBoard: BoardItem[] = Array.from(
       { length: 100 },
       (_, index) => ({
@@ -123,6 +79,8 @@ const RandomBox: React.FC = () => {
               chatType:
                 collectionType === "chat" ? ChatType.CHAT : ChatType.DONATION,
               from: startTime,
+              message:
+                chatCollectionMode === "command" ? chatCommand : undefined,
             }
           );
 
@@ -162,6 +120,8 @@ const RandomBox: React.FC = () => {
     selectedChannel,
     isConfigured,
     collectionType,
+    chatCollectionMode,
+    chatCommand,
     board,
     participants,
     selectedItems,
@@ -177,33 +137,10 @@ const RandomBox: React.FC = () => {
     return color;
   };
 
-  const handleMockDraw = () => {
-    if (participants.size < 100) {
-      const randomIndex = Math.floor(Math.random() * board.length);
-      const selectedItem = board[randomIndex];
-      if (!selectedItems.includes(selectedItem.id)) {
-        const userId = getRandomMockUsername();
-        setParticipants((prev) => new Set(prev).add(userId));
-        setSelectedItems((prev) => [...prev, selectedItem.id]);
-        setBoard((prev) => {
-          const newBoard = [...prev];
-          newBoard[randomIndex] = {
-            ...selectedItem,
-            userId,
-            color: getRandomColor(),
-            message: "!뽑기",
-          };
-          return newBoard;
-        });
-      }
-    }
-  };
-
   const handleShowResult = () => {
     if (board.length > 0) {
-      // 채팅 수집 중지
       const currentTime = new Date();
-      setStartTime(currentTime); // 현재 시간으로 업데이트하여 이전 채팅 무시
+      setStartTime(currentTime);
 
       const randomIndex = Math.floor(Math.random() * board.length);
       const winningItem = board[randomIndex];
@@ -249,6 +186,11 @@ const RandomBox: React.FC = () => {
     setShowWinnerMessage(false);
     setWinners([]);
     setStartTime(new Date());
+    setCollectionType("chat");
+    setChatCollectionMode("all");
+    setChatCommand("!뽑기");
+    setDonationAmount(1000);
+    setIsCustomAmount(false);
     const initialBoard: BoardItem[] = Array.from(
       { length: 100 },
       (_, index) => ({
@@ -265,11 +207,12 @@ const RandomBox: React.FC = () => {
     { value: "custom" as const, label: "직접 설정" },
   ];
 
-  // 채널 변경 시 설정 초기화
   const handleChannelSelect = (channel: Channel | null) => {
     setSelectedChannel(channel);
     setIsConfigured(false);
     setCollectionType("chat");
+    setChatCollectionMode("all");
+    setChatCommand("!뽑기");
     setDonationAmount(1000);
     setIsCustomAmount(false);
     setSelectedItems([]);
@@ -341,6 +284,46 @@ const RandomBox: React.FC = () => {
                   </label>
                 </div>
               </div>
+              {collectionType === "chat" && (
+                <div className="config-section">
+                  <h3>채팅 수집 방식</h3>
+                  <div className="radio-group">
+                    <label>
+                      <input
+                        type="radio"
+                        value="all"
+                        checked={chatCollectionMode === "all"}
+                        onChange={(e) =>
+                          setChatCollectionMode(e.target.value as "all")
+                        }
+                      />
+                      모든 채팅
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        value="command"
+                        checked={chatCollectionMode === "command"}
+                        onChange={(e) =>
+                          setChatCollectionMode(e.target.value as "command")
+                        }
+                      />
+                      특정 명령어
+                    </label>
+                  </div>
+                  {chatCollectionMode === "command" && (
+                    <div className="command-input">
+                      <input
+                        type="text"
+                        value={chatCommand}
+                        onChange={(e) => setChatCommand(e.target.value)}
+                        placeholder="명령어 입력 (예: !뽑기)"
+                        className="command-text-input"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
               {collectionType === "donation" && (
                 <div className="config-section">
                   <h3>후원 금액</h3>
@@ -392,22 +375,34 @@ const RandomBox: React.FC = () => {
           ) : (
             <div className="random-box-container">
               <div className="box-header">
-                <h1>!뽑기를 쳐보세요</h1>
+                <div className="box-title">
+                  <h1>!뽑기</h1>
+                  <p className="box-subtitle">채팅창에 !뽑기를 입력해보세요</p>
+                </div>
                 <p className="box-warning">
                   ⚠️ 새로고침 시 모든 내역이 사라집니다
                 </p>
                 <div className="button-group">
-                  <button onClick={handleMockDraw} className="mock-draw-btn">
-                    !뽑기
-                  </button>
                   <button
                     onClick={handleShowResult}
-                    className="show-result-btn"
+                    className="icon-btn show-result-btn"
+                    title="결과보기"
                   >
-                    결과보기
+                    <FaDice />
                   </button>
-                  <button onClick={handleReset} className="reset-btn">
-                    다시하기
+                  <button
+                    onClick={handleReset}
+                    className="icon-btn reset-btn"
+                    title="다시하기"
+                  >
+                    <FaRedo />
+                  </button>
+                  <button
+                    onClick={() => setIsConfigured(false)}
+                    className="icon-btn back-btn"
+                    title="처음으로"
+                  >
+                    <FaHome />
                   </button>
                 </div>
               </div>
