@@ -57,10 +57,15 @@
 
 .box-title h1 {
   font-size: 2.5rem;
-  font-weight: bold;
-  color: #ff6b6b;
   margin: 0;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  color: #ff6b6b;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.box-title p {
+  font-size: 1.2rem;
+  margin: 0.5rem 0 0;
+  color: #ff9e7d;
 }
 
 .box-subtitle {

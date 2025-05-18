@@ -242,6 +242,19 @@ const RandomBox: React.FC = () => {
   const handleStart = () => {
     setStartTime(new Date());
     setIsConfigured(true);
+    setSelectedItems([]);
+    setParticipants(new Set());
+    setWinner(null);
+    setShowConfetti(false);
+    setShowWinnerMessage(false);
+    setWinners([]);
+    const initialBoard: BoardItem[] = Array.from(
+      { length: 100 },
+      (_, index) => ({
+        id: index + 1,
+      })
+    );
+    setBoard(initialBoard);
   };
 
   return (
@@ -376,8 +389,20 @@ const RandomBox: React.FC = () => {
             <div className="random-box-container">
               <div className="box-header">
                 <div className="box-title">
-                  <h1>!뽑기</h1>
-                  <p className="box-subtitle">채팅창에 !뽑기를 입력해보세요</p>
+                  <h1>
+                    {collectionType === "donation"
+                      ? `${donationAmount.toLocaleString()}원 후원`
+                      : chatCollectionMode === "command"
+                      ? chatCommand
+                      : "모든 채팅"}
+                  </h1>
+                  <p className="box-subtitle">
+                    {collectionType === "donation"
+                      ? `${donationAmount.toLocaleString()}원 이상 후원해보세요`
+                      : chatCollectionMode === "command"
+                      ? `채팅창에 ${chatCommand}를 입력해보세요`
+                      : "아무 채팅이나 입력해보세요"}
+                  </p>
                 </div>
                 <p className="box-warning">
                   ⚠️ 새로고침 시 모든 내역이 사라집니다
