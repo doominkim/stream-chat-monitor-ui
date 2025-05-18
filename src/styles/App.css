@@ -1,0 +1,29 @@
+.user-detail-page {
+  padding: 0 1rem;
+  height: 800px;
+  overflow-y: scroll;
+  position: relative;
+  display: block;
+}
+
+.user-detail-page > * {
+  width: 100%;
+}
+
+.user-detail-page::-webkit-scrollbar {
+  width: 8px;
+}
+
+.user-detail-page::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.user-detail-page::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.user-detail-page::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}

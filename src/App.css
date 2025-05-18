@@ -231,6 +231,7 @@ main {
   height: calc(100vh - 3.5rem);
   display: flex;
   flex-direction: column;
+  padding-bottom: 1rem;
 }
 
 main::-webkit-scrollbar {
@@ -359,7 +360,7 @@ footer {
   padding: 1rem 0;
   border-top: 1px solid var(--border-color);
   z-index: 10;
-  height: 4rem;
+  height: 3rem;
 }
 
 /* Hide footer on UserDetail page */
