@@ -110,9 +110,12 @@
   text-align: center;
   position: relative;
   overflow: hidden;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   word-wrap: break-word;
   word-break: break-all;
+  box-sizing: border-box;
+  max-width: 98%;
+  max-height: 98%;
 }
 
 .board-item span {
