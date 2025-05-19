@@ -958,7 +958,7 @@ footer .footer-content {
 }
 
 .user-detail-page {
-  padding: 0 1rem;
+  padding: 1rem;
   height: calc(100vh - 3.5rem);
   overflow-y: auto;
 }

@@ -1,5 +1,5 @@
 .user-detail-page {
-  padding: 0 1rem;
+  padding: 2rem;
   height: 800px;
   overflow-y: scroll;
   position: relative;
@@ -8,6 +8,316 @@
 
 .user-detail-page > * {
   width: 100%;
+}
+
+.user-container {
+  flex: 1;
+  max-width: 800px;
+  margin: 2rem auto 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.user-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+  background-color: var(--bg-primary);
+  border-radius: 1rem;
+  border: 1px solid var(--border-color);
+}
+
+.user-info {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.user-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.user-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge.early_supporter {
+  background-color: rgba(0, 255, 163, 0.1);
+  color: var(--primary-color);
+}
+
+.badge.chat_enthusiast {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+}
+
+.badge.gift_giver {
+  background-color: rgba(255, 87, 34, 0.1);
+  color: #ff5722;
+}
+
+.analysis-card {
+  background-color: var(--bg-primary);
+  border-radius: 1rem;
+  border: 1px solid var(--border-color);
+  padding: 2rem;
+}
+
+.analysis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.analysis-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.toxicity-score {
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.toxicity-score.good {
+  background-color: rgba(0, 255, 163, 0.1);
+  color: var(--primary-color);
+}
+
+.toxicity-score.warning {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+}
+
+.toxicity-score.danger {
+  background-color: rgba(255, 87, 34, 0.1);
+  color: #ff5722;
+}
+
+.analysis-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.analysis-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.analysis-subtitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.analysis-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.analysis-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background-color: var(--bg-secondary);
+  border-radius: 0.5rem;
+}
+
+.analysis-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.analysis-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.warning-list .analysis-list-item::before {
+  content: "⚠️";
+}
+
+.positive-list .analysis-list-item::before {
+  content: "✨";
+}
+
+.personality-card {
+  background-color: var(--bg-primary);
+  border-radius: 1rem;
+  border: 1px solid var(--border-color);
+  padding: 2rem;
+}
+
+.personality-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.personality-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.personality-type {
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background-color: rgba(0, 255, 163, 0.1);
+  color: var(--primary-color);
+}
+
+.personality-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+.personality-traits {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.trait-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.trait-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.trait-icon {
+  font-size: 1.25rem;
+}
+
+.trait-name {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.trait-bar-container {
+  position: relative;
+  height: 0.5rem;
+  background-color: var(--bg-secondary);
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.trait-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background-color: var(--primary-color);
+  border-radius: 0.25rem;
+  transition: width 0.3s ease;
+}
+
+.trait-value {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.personality-section {
+  margin-top: 1.5rem;
+}
+
+.personality-subtitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.characteristics-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.characteristic-item {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.characteristic-item::before {
+  content: "•";
+  position: absolute;
+  left: 0.5rem;
+  color: var(--primary-color);
+}
+
+.matching-streamers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.matching-streamer {
+  padding: 0.25rem 0.75rem;
+  background-color: var(--bg-secondary);
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
 }
 
 .user-detail-page::-webkit-scrollbar {

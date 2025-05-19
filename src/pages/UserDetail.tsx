@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/UserDetail.css";
 
 interface User {
@@ -18,6 +18,13 @@ interface Channel {
   follower: number;
   openLive: boolean;
   chatCount: number;
+}
+
+interface ChatMessage {
+  id: string;
+  content: string;
+  timestamp: string;
+  sentiment: "positive" | "negative" | "neutral";
 }
 
 const mockUser: User = {
@@ -58,8 +65,138 @@ const mockChannels: Channel[] = [
   },
 ];
 
+const mockChats: Record<string, ChatMessage[]> = {
+  channel1: [
+    {
+      id: "1",
+      content: "안녕하세요! 오늘도 재미있는 방송 감사합니다!",
+      timestamp: "2024-03-20 19:00:00",
+      sentiment: "positive",
+    },
+    {
+      id: "2",
+      content: "이번 게임 정말 재미있네요!",
+      timestamp: "2024-03-20 19:05:00",
+      sentiment: "positive",
+    },
+    {
+      id: "3",
+      content: "아쉽네요... 다음에는 이길 수 있을 거예요!",
+      timestamp: "2024-03-20 19:10:00",
+      sentiment: "neutral",
+    },
+    {
+      id: "4",
+      content: "이거 어떻게 하는 거예요?",
+      timestamp: "2024-03-20 19:15:00",
+      sentiment: "neutral",
+    },
+    {
+      id: "5",
+      content: "와 진짜 대박이네요!",
+      timestamp: "2024-03-20 19:20:00",
+      sentiment: "positive",
+    },
+    {
+      id: "6",
+      content: "이거 실패했네요...",
+      timestamp: "2024-03-20 19:25:00",
+      sentiment: "negative",
+    },
+    {
+      id: "7",
+      content: "다음 게임은 뭐하실 건가요?",
+      timestamp: "2024-03-20 19:30:00",
+      sentiment: "neutral",
+    },
+    {
+      id: "8",
+      content: "방송 잘 보고 있습니다!",
+      timestamp: "2024-03-20 19:35:00",
+      sentiment: "positive",
+    },
+  ],
+  channel2: [
+    {
+      id: "9",
+      content: "방송 잘 보고 있습니다!",
+      timestamp: "2024-03-20 20:00:00",
+      sentiment: "positive",
+    },
+    {
+      id: "10",
+      content: "이거 실패했네요...",
+      timestamp: "2024-03-20 20:05:00",
+      sentiment: "negative",
+    },
+    {
+      id: "11",
+      content: "다음 게임은 뭐하실 건가요?",
+      timestamp: "2024-03-20 20:10:00",
+      sentiment: "neutral",
+    },
+    {
+      id: "12",
+      content: "와 진짜 대박이네요!",
+      timestamp: "2024-03-20 20:15:00",
+      sentiment: "positive",
+    },
+    {
+      id: "13",
+      content: "이거 어떻게 하는 거예요?",
+      timestamp: "2024-03-20 20:20:00",
+      sentiment: "neutral",
+    },
+  ],
+  channel3: [
+    {
+      id: "14",
+      content: "오늘도 좋은 방송 감사합니다!",
+      timestamp: "2024-03-20 21:00:00",
+      sentiment: "positive",
+    },
+    {
+      id: "15",
+      content: "이거 어떻게 하는 거예요?",
+      timestamp: "2024-03-20 21:05:00",
+      sentiment: "neutral",
+    },
+    {
+      id: "16",
+      content: "와 진짜 대박이네요!",
+      timestamp: "2024-03-20 21:10:00",
+      sentiment: "positive",
+    },
+    {
+      id: "17",
+      content: "이거 실패했네요...",
+      timestamp: "2024-03-20 21:15:00",
+      sentiment: "negative",
+    },
+    {
+      id: "18",
+      content: "다음 게임은 뭐하실 건가요?",
+      timestamp: "2024-03-20 21:20:00",
+      sentiment: "neutral",
+    },
+    {
+      id: "19",
+      content: "방송 잘 보고 있습니다!",
+      timestamp: "2024-03-20 21:25:00",
+      sentiment: "positive",
+    },
+  ],
+};
+
 const UserDetail: React.FC = () => {
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
+
+  useEffect(() => {
+    document.title = `${mockUser.nickname} - 유저 분석 | 스트림 채팅 모니터`;
+    return () => {
+      document.title = "스트림 채팅 모니터";
+    };
+  }, [mockUser.nickname]);
 
   return (
     <div className="user-detail-page">
@@ -129,9 +266,34 @@ const UserDetail: React.FC = () => {
           </div>
         </div>
         <div className="user-chats">
-          <div className="chat-placeholder">
-            채널을 선택하면 채팅 내역이 표시됩니다.
-          </div>
+          {selectedChannel ? (
+            <div className="chat-list">
+              <div className="chat-date-header">
+                {new Date(
+                  mockChats[selectedChannel.uuid][0].timestamp
+                ).toLocaleDateString()}
+              </div>
+              {mockChats[selectedChannel.uuid]?.map((chat) => (
+                <div key={chat.id} className={`chat-item ${chat.sentiment}`}>
+                  <div className="chat-content">{chat.content}</div>
+                  <div className="chat-meta">
+                    <span className="chat-time">
+                      {new Date(chat.timestamp).toLocaleTimeString()}
+                    </span>
+                    <span className={`chat-sentiment ${chat.sentiment}`}>
+                      {chat.sentiment === "positive" && "긍정적"}
+                      {chat.sentiment === "negative" && "부정적"}
+                      {chat.sentiment === "neutral" && "중립적"}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="chat-placeholder">
+              채널을 선택하면 채팅 내역이 표시됩니다.
+            </div>
+          )}
         </div>
       </div>
     </div>
