@@ -7,7 +7,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { FaDesktop } from "react-icons/fa";
-import { Helmet } from "react-helmet";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import SearchUser from "./pages/SearchUser";
@@ -159,9 +159,11 @@ function AppContent() {
 
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <HelmetProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </HelmetProvider>
   );
 }
 
