@@ -4,8 +4,10 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import { FaDesktop } from "react-icons/fa";
+import { Helmet } from "react-helmet";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import SearchUser from "./pages/SearchUser";
@@ -17,6 +19,40 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import HealthStatus from "./components/HealthStatus";
 import "./App.css";
+
+function PageTitle() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const getPageTitle = () => {
+      const path = location.pathname;
+      if (path.startsWith("/user/") && path.includes("/chat")) {
+        return "채팅 내역";
+      }
+      if (path.startsWith("/user/")) {
+        return "사용자 상세";
+      }
+      switch (path) {
+        case "/login":
+          return "로그인";
+        case "/dashboard":
+          return "대시보드";
+        case "/search":
+          return "사용자 검색";
+        case "/subtitle":
+          return "자막";
+        case "/random-box":
+          return "랜덤 박스";
+        default:
+          return "홈";
+      }
+    };
+
+    document.title = `치지직 놀이터 - ${getPageTitle()}`;
+  }, [location]);
+
+  return null;
+}
 
 function MobileWarning() {
   return (
@@ -33,6 +69,9 @@ function MobileWarning() {
         color: "var(--text-primary)",
       }}
     >
+      <Helmet>
+        <title>치지직 놀이터 - PC 전용 서비스</title>
+      </Helmet>
       <FaDesktop
         style={{
           fontSize: "4rem",
@@ -72,7 +111,7 @@ function MobileWarning() {
   );
 }
 
-function App() {
+function AppContent() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
@@ -96,25 +135,32 @@ function App() {
   }
 
   return (
+    <div className="app-container">
+      <PageTitle />
+      <Header />
+      <main>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/search" element={<SearchUser />} />
+          <Route path="/user/:userId" element={<UserDetail />} />
+          <Route path="/user/:userId/chat" element={<ChatHistory />} />
+          <Route path="/subtitle" element={<Subtitle />} />
+          <Route path="/random-box" element={<RandomBox />} />
+          <Route path="/" element={<Navigate to="/subtitle" replace />} />
+        </Routes>
+      </main>
+      <Footer>
+        <HealthStatus />
+      </Footer>
+    </div>
+  );
+}
+
+function App() {
+  return (
     <Router>
-      <div className="app-container">
-        <Header />
-        <main>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/search" element={<SearchUser />} />
-            <Route path="/user/:userId" element={<UserDetail />} />
-            <Route path="/user/:userId/chat" element={<ChatHistory />} />
-            <Route path="/subtitle" element={<Subtitle />} />
-            <Route path="/random-box" element={<RandomBox />} />
-            <Route path="/" element={<Navigate to="/subtitle" replace />} />
-          </Routes>
-        </main>
-        <Footer>
-          <HealthStatus />
-        </Footer>
-      </div>
+      <AppContent />
     </Router>
   );
 }
