@@ -54,6 +54,7 @@ export interface ChatMessage {
   nickname: string;
   message: string;
   timestamp: string;
+  createdAt: string;
 }
 
 export interface ChatResponse {

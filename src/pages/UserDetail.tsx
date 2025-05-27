@@ -49,7 +49,6 @@ const UserDetail: React.FC = () => {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [dateRange, setDateRange] = useState({ from: "", to: "" });
 
   const loadChannels = async (userNickname: string) => {
     setChannelsLoading(true);
@@ -102,12 +101,20 @@ const UserDetail: React.FC = () => {
       });
 
       // API 데이터를 UI 데이터 형식으로 변환
-      const transformedMessages: ChatMessage[] = chatData.map((msg, index) => ({
-        id: `${channel.uuid}-${index}`,
-        content: msg.message,
-        timestamp: msg.timestamp,
-        sentiment: "neutral" as const, // 기본값으로 설정
-      }));
+      const transformedMessages: ChatMessage[] = chatData.map((msg, index) => {
+        console.log(
+          "API createdAt:",
+          msg.createdAt,
+          "Type:",
+          typeof msg.createdAt
+        );
+        return {
+          id: `${channel.uuid}-${index}`,
+          content: msg.message,
+          timestamp: msg.createdAt, // createdAt을 timestamp로 사용
+          sentiment: "neutral" as const, // 기본값으로 설정
+        };
+      });
 
       setChatMessages(transformedMessages);
     } catch (error) {
@@ -128,11 +135,15 @@ const UserDetail: React.FC = () => {
 
     const filters = {
       message: searchQuery || undefined,
-      from: dateRange.from ? new Date(dateRange.from) : undefined,
-      to: dateRange.to ? new Date(dateRange.to) : undefined,
     };
 
     loadChatMessages(selectedChannel, filters);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
   };
 
   useEffect(() => {
@@ -233,34 +244,8 @@ const UserDetail: React.FC = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="search-input"
+                    onKeyDown={handleKeyDown}
                   />
-                </div>
-                <div className="filter-row">
-                  <input
-                    type="datetime-local"
-                    value={dateRange.from}
-                    onChange={(e) =>
-                      setDateRange((prev) => ({
-                        ...prev,
-                        from: e.target.value,
-                      }))
-                    }
-                    className="date-input"
-                  />
-                  <span>~</span>
-                  <input
-                    type="datetime-local"
-                    value={dateRange.to}
-                    onChange={(e) =>
-                      setDateRange((prev) => ({ ...prev, to: e.target.value }))
-                    }
-                    className="date-input"
-                  />
-                </div>
-                <div className="filter-actions">
-                  <button onClick={handleSearch} className="search-btn">
-                    검색
-                  </button>
                 </div>
               </div>
 
@@ -271,16 +256,24 @@ const UserDetail: React.FC = () => {
                   <>
                     <div className="chat-date-header">
                       {chatMessages[0] &&
-                        new Date(
-                          chatMessages[0].timestamp
-                        ).toLocaleDateString()}
+                        (() => {
+                          const date = new Date(chatMessages[0].timestamp);
+                          return isNaN(date.getTime())
+                            ? "날짜 정보 없음"
+                            : date.toLocaleDateString();
+                        })()}
                     </div>
                     {chatMessages.map((chat) => (
                       <div key={chat.id} className="chat-item">
                         <div className="chat-content">{chat.content}</div>
                         <div className="chat-meta">
                           <span className="chat-time">
-                            {new Date(chat.timestamp).toLocaleTimeString()}
+                            {(() => {
+                              const date = new Date(chat.timestamp);
+                              return isNaN(date.getTime())
+                                ? "시간 정보 없음"
+                                : date.toLocaleTimeString();
+                            })()}
                           </span>
                         </div>
                       </div>
