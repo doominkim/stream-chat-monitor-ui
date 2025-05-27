@@ -158,139 +158,121 @@ const UserDetail: React.FC = () => {
 
   return (
     <div className="user-detail-page">
-      <div className="user-profile-card">
-        <div className="user-profile-info">
-          <div className="user-header">
-            <h1>{userId || "알 수 없는 사용자"}</h1>
-            <div className="user-tags">
-              {mockUser.tags.map((tag) => (
-                <span key={tag} className="user-tag">
-                  {tag}
-                </span>
-              ))}
-            </div>
+      <div className="user-profile-section">
+        <div className="user-header">
+          <h1>{userId || "알 수 없는 사용자"}</h1>
+          <div className="user-tags">
+            {mockUser.tags.map((tag) => (
+              <span key={tag} className="user-tag">
+                {tag}
+              </span>
+            ))}
           </div>
-          <div className="user-ai-analysis">
-            <h3>AI 분석</h3>
-            <p>{mockUser.aiAnalysis}</p>
-          </div>
+        </div>
+        <div className="user-ai-analysis">
+          <h3>AI 분석</h3>
+          <p>{mockUser.aiAnalysis}</p>
         </div>
       </div>
 
-      <div className="user-content">
-        <div className="user-channels">
-          <div className="channel-navigator">
-            <div className="channel-navigator-header">
-              <div className="channel-navigator-title">채팅 채널</div>
-              <div className="channel-navigator-count">
-                {channelsLoading ? "로딩 중..." : `${channels.length}개의 채널`}
-              </div>
-            </div>
-            <div className="channel-list">
-              {channelsLoading ? (
-                <div className="channel-loading">채널을 불러오는 중...</div>
-              ) : channels.length > 0 ? (
-                channels.map((channel) => (
-                  <div
-                    key={channel.uuid}
-                    className={`channel-card ${
-                      selectedChannel?.uuid === channel.uuid ? "selected" : ""
-                    }`}
-                    onClick={() => handleChannelSelect(channel)}
-                  >
-                    <div className="channel-info">
-                      <div
-                        className={`channel-avatar ${
-                          channel.openLive ? "live" : ""
-                        }`}
-                      >
-                        <img
-                          src={channel.channelImageUrl}
-                          alt={channel.channelName}
-                        />
-                      </div>
-                      <div className="channel-details">
-                        <div className="channel-name">
-                          {channel.channelName}
-                        </div>
-                        <div className="channel-meta">
-                          <div className="channel-viewers">
-                            • {channel.follower.toLocaleString()}
-                          </div>
-                          <div className="channel-chat-count">
-                            • 채팅 {channel.chatCount.toLocaleString()}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="channel-placeholder">
-                  해당 사용자의 채널을 찾을 수 없습니다.
-                </div>
-              )}
+      <div className="content-section">
+        <div className="channels-panel">
+          <div className="channels-header">
+            <div className="channels-title">채팅 채널</div>
+            <div className="channels-count">
+              {channelsLoading ? "로딩 중..." : `${channels.length}개의 채널`}
             </div>
           </div>
-        </div>
-        <div className="user-chats">
-          {selectedChannel ? (
-            <div className="chat-section">
-              <div className="chat-filters">
-                <div className="filter-row">
-                  <input
-                    type="text"
-                    placeholder="메시지 검색..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="search-input"
-                    onKeyDown={handleKeyDown}
-                  />
-                </div>
-              </div>
-
-              <div className="chat-list">
-                {loading ? (
-                  <div className="chat-loading">채팅을 불러오는 중...</div>
-                ) : chatMessages.length > 0 ? (
-                  <>
-                    <div className="chat-date-header">
-                      {chatMessages[0] &&
-                        (() => {
-                          const date = new Date(chatMessages[0].timestamp);
-                          return isNaN(date.getTime())
-                            ? "날짜 정보 없음"
-                            : date.toLocaleDateString();
-                        })()}
+          <div className="channels-list">
+            {channelsLoading ? (
+              <div className="loading-state">채널을 불러오는 중...</div>
+            ) : channels.length > 0 ? (
+              channels.map((channel) => (
+                <div
+                  key={channel.uuid}
+                  className={`channel-item ${
+                    selectedChannel?.uuid === channel.uuid ? "selected" : ""
+                  }`}
+                  onClick={() => handleChannelSelect(channel)}
+                >
+                  <div className="channel-info">
+                    <div className="channel-avatar">
+                      <img
+                        src={
+                          channel.channelImageUrl ||
+                          "https://via.placeholder.com/48"
+                        }
+                        alt={channel.channelName}
+                      />
                     </div>
-                    {chatMessages.map((chat) => (
-                      <div key={chat.id} className="chat-item">
-                        <div className="chat-content">{chat.content}</div>
-                        <div className="chat-meta">
-                          <span className="chat-time">
-                            {(() => {
-                              const date = new Date(chat.timestamp);
-                              return isNaN(date.getTime())
-                                ? "시간 정보 없음"
-                                : date.toLocaleTimeString();
-                            })()}
-                          </span>
-                        </div>
+                    <div className="channel-details">
+                      <div className="channel-name">{channel.channelName}</div>
+                      <div className="channel-meta">
+                        <span>팔로워 {channel.follower.toLocaleString()}</span>
+                        <span>채팅 {channel.chatCount}개</span>
+                        {channel.openLive && (
+                          <span style={{ color: "#ff6b6b" }}>● LIVE</span>
+                        )}
                       </div>
-                    ))}
-                  </>
-                ) : (
-                  <div className="chat-placeholder">
-                    선택한 채널에 채팅 메시지가 없습니다.
+                    </div>
                   </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="chat-placeholder">
-              채널을 선택하면 채팅 내역이 표시됩니다.
-            </div>
-          )}
+                </div>
+              ))
+            ) : (
+              <div className="placeholder-state">채널이 없습니다</div>
+            )}
+          </div>
+        </div>
+
+        <div className="chats-panel">
+          <div className="chats-header">
+            <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 600 }}>
+              {selectedChannel ? `${selectedChannel.channelName} 채팅` : "채팅"}
+            </h2>
+          </div>
+          <div className="chat-filters">
+            <input
+              type="text"
+              className="filter-input"
+              placeholder="메시지 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+          </div>
+          <div className="chats-list">
+            {loading ? (
+              <div className="loading-state">채팅을 불러오는 중...</div>
+            ) : chatMessages.length > 0 ? (
+              chatMessages.map((message) => {
+                const date = new Date(message.timestamp);
+                const isValidDate = !isNaN(date.getTime());
+                const formattedTime = isValidDate
+                  ? date.toLocaleString("ko-KR", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "시간 정보 없음";
+
+                return (
+                  <div
+                    key={message.id}
+                    className={`chat-message ${message.sentiment}`}
+                  >
+                    <div className="chat-content">{message.content}</div>
+                    <div className="chat-time">{formattedTime}</div>
+                  </div>
+                );
+              })
+            ) : selectedChannel ? (
+              <div className="placeholder-state">채팅이 없습니다</div>
+            ) : (
+              <div className="placeholder-state">채널을 선택해주세요</div>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -1,194 +1,154 @@
+/* 완전히 새로운 레이아웃 */
 .user-detail-page {
-  display: flex;
-  flex-direction: column;
+  width: 100%;
+  max-width: 960px; /* main과 동일한 max-width */
+  margin: 0 auto;
+  padding: 0.5rem; /* main과 동일한 패딩 */
   background-color: #1a1a1a;
   color: #fff;
-  gap: 1rem;
-  overflow-y: auto;
-  margin-top: 2rem;
+  /* main 컨테이너 높이보다 확실히 크게 설정 */
+  height: calc(100vh + 500px); /* main보다 훨씬 크게 */
+  flex-shrink: 0; /* flex 축소 방지 */
+  box-sizing: border-box; /* 패딩 포함한 크기 계산 */
 }
 
-.user-profile-card {
+.user-profile-section {
   background-color: #2a2a2a;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.user-profile-info {
-  width: 100%;
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .user-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 16px;
 }
 
 .user-header h1 {
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: 600;
-  margin: 0;
+  margin: 0 0 12px 0;
   color: #fff;
 }
 
 .user-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.25rem;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
 .user-tag {
   background-color: #3a3a3a;
   color: #00ffa3;
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.875rem;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
   font-weight: 500;
   border: 1px solid #00ffa3;
 }
 
 .user-ai-analysis {
-  background-color: #3a3a3a;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  margin-top: 1rem;
+  background-color: #333;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 16px;
 }
 
 .user-ai-analysis h3 {
-  font-size: 1rem;
+  font-size: 18px;
   font-weight: 600;
   color: #00ffa3;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 12px 0;
 }
 
 .user-ai-analysis p {
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.6;
   color: #ccc;
   margin: 0;
   white-space: pre-wrap;
 }
 
-.user-content {
-  flex: 1;
+.content-section {
   display: flex;
-  gap: 1rem;
-  min-height: 0;
+  gap: 16px; /* gap 줄임 */
+  height: 800px; /* 고정 높이 */
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.user-channels {
-  width: 300px;
+.channels-panel {
+  width: 300px; /* 너비 줄임 */
+  min-width: 300px; /* 최소 너비 설정 */
   background-color: #2a2a2a;
-  border-radius: 0.5rem;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.user-chats {
-  flex: 1;
-  background-color: #2a2a2a;
-  border-radius: 0.5rem;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
 }
 
-.chat-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #666;
-  font-size: 1.1rem;
-  padding: 2rem;
-}
-
-/* ChannelNavigator 스타일 재사용 */
-.channel-navigator {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.channel-navigator-header {
-  padding: 1.25rem;
+.channels-header {
+  padding: 16px; /* 패딩 줄임 */
   border-bottom: 1px solid #3a3a3a;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   background-color: #2a2a2a;
 }
 
-.channel-navigator-title {
-  font-size: 1.25rem;
+.channels-title {
+  font-size: 20px;
   font-weight: 600;
   color: #fff;
+  margin: 0;
 }
 
-.channel-navigator-count {
-  font-size: 0.9rem;
-  color: #666;
+.channels-count {
+  font-size: 14px;
+  color: #888;
   background-color: #3a3a3a;
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
+  padding: 4px 12px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-top: 8px;
 }
 
-.channel-list {
+.channels-list {
   flex: 1;
   overflow-y: auto;
-  padding: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  padding: 12px; /* 패딩 줄임 */
 }
 
-.channel-card {
-  background-color: #2a2a2a;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
+.channel-item {
+  background-color: #333;
+  padding: 16px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  margin-bottom: 12px;
 }
 
-.channel-card:hover {
-  background-color: #333;
-  transform: translateY(-1px);
-}
-
-.channel-card.selected {
+.channel-item:hover {
   background-color: #3a3a3a;
-  border: 1px solid #4a4a4a;
+  transform: translateY(-2px);
+}
+
+.channel-item.selected {
+  background-color: #404040;
+  border: 1px solid #00ffa3;
 }
 
 .channel-info {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 12px;
 }
 
 .channel-avatar {
-  width: 3rem;
-  height: 3rem;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  position: relative;
-}
-
-.channel-avatar.live::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 2px solid #ff6b6b;
-  border-radius: 50%;
-  box-sizing: border-box;
 }
 
 .channel-avatar img {
@@ -208,335 +168,140 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 0.25rem;
+  margin-bottom: 4px;
+  font-size: 16px;
 }
 
 .channel-meta {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 0.875rem;
+  gap: 12px;
+  font-size: 14px;
   color: #888;
 }
 
-.channel-viewers,
-.channel-chat-count {
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-/* 스크롤바 스타일 */
-.channel-list::-webkit-scrollbar,
-.user-chats::-webkit-scrollbar {
-  width: 6px;
-}
-
-.channel-list::-webkit-scrollbar-track,
-.user-chats::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.channel-list::-webkit-scrollbar-thumb,
-.user-chats::-webkit-scrollbar-thumb {
-  background-color: #3a3a3a;
-  border-radius: 3px;
-}
-
-.channel-list::-webkit-scrollbar-thumb:hover,
-.user-chats::-webkit-scrollbar-thumb:hover {
-  background-color: #4a4a4a;
-}
-
-.user-detail-page::-webkit-scrollbar {
-  width: 8px;
-}
-
-.user-detail-page::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-  border-radius: 4px;
-}
-
-.user-detail-page::-webkit-scrollbar-thumb {
-  background: #00ffa3;
-  border-radius: 4px;
-}
-
-.user-detail-page::-webkit-scrollbar-thumb:hover {
-  background: #00e695;
-}
-
-.scroll-to-top {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: #dcfce7;
-  color: #166534;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 9999;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.scroll-to-top.visible {
-  opacity: 1;
-}
-
-.scroll-to-top:hover {
-  background-color: #bbf7d0;
-  transform: scale(1.1);
-}
-
-.user-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  width: 100%;
-  position: relative;
-  overflow-y: auto;
-}
-
-.user-container::-webkit-scrollbar {
-  width: 8px;
-}
-
-.user-container::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.user-container::-webkit-scrollbar-thumb {
-  background-color: #d1d5db;
-  border-radius: 4px;
-}
-
-.user-container::-webkit-scrollbar-thumb:hover {
-  background-color: #9ca3af;
-}
-
-.user-container > * {
-  direction: ltr;
-}
-
-.user-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 20px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.chat-toggle-button {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  height: 36px;
-  min-width: 100px;
-  justify-content: center;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-}
-
-.chat-toggle-button:hover {
-  background-color: var(--border-color);
-}
-
-.chat-list {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.chats-panel {
   flex: 1;
-  overflow-y: auto;
-  position: relative;
-  align-items: flex-end;
-}
-
-.chat-date-header {
-  position: sticky;
-  top: 0;
   background-color: #2a2a2a;
-  padding: 0.75rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #00ffa3;
-  border-bottom: 1px solid #3a3a3a;
-  z-index: 1;
-  margin: -1rem -1rem 1rem -1rem;
-  text-align: left;
-  width: 100%;
-  box-sizing: border-box;
-  align-self: stretch;
-}
-
-.chat-item {
-  background-color: var(--bg-primary);
-  padding: 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--border-color);
-  position: relative;
-  margin-bottom: 1.5rem;
-  max-width: 80%;
-}
-
-.chat-item.positive {
-  border-left: 4px solid var(--primary-color);
-}
-
-.chat-item.negative {
-  border-left: 4px solid #ff5722;
-}
-
-.chat-item.neutral {
-  border-left: 4px solid #9ca3af;
-}
-
-.chat-content {
-  font-size: 0.875rem;
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
-  line-height: 1.5;
-}
-
-.chat-meta {
-  position: absolute;
-  right: 0;
-  bottom: -1.25rem;
-  font-size: 0.75rem;
-}
-
-.chat-time {
-  font-size: 0.75rem;
-  color: #666;
-  margin-left: auto;
-}
-
-/* Chat filters styles */
-.chat-section {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: 100%;
+}
+
+.chats-header {
+  padding: 16px; /* 패딩 줄임 */
+  border-bottom: 1px solid #3a3a3a;
+  background-color: #2a2a2a;
 }
 
 .chat-filters {
   background-color: #333;
-  padding: 1rem;
-  border-bottom: 1px solid #444;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  padding: 12px; /* 패딩 줄임 */
+  border-bottom: 1px solid #3a3a3a;
 }
 
-.filter-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.search-input {
-  flex: 1;
-  padding: 0.5rem;
+.filter-input {
+  width: 100%;
+  max-width: 100%; /* 최대 너비 제한 */
+  padding: 10px; /* 패딩 줄임 */
   background-color: #2a2a2a;
   border: 1px solid #444;
-  border-radius: 0.25rem;
+  border-radius: 6px;
   color: #fff;
-  font-size: 0.875rem;
+  font-size: 14px;
+  box-sizing: border-box; /* 패딩 포함한 크기 계산 */
 }
 
-.search-input:focus {
+.filter-input:focus {
   outline: none;
   border-color: #00ffa3;
 }
 
-.search-input::placeholder {
+.filter-input::placeholder {
   color: #666;
 }
 
-.date-input {
-  padding: 0.5rem;
-  background-color: #2a2a2a;
-  border: 1px solid #444;
-  border-radius: 0.25rem;
+.chats-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px; /* 패딩 줄임 */
+}
+
+.chat-message {
+  background-color: #333;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  max-width: 85%;
+  margin-left: auto;
+  position: relative;
+}
+
+.chat-message.positive {
+  border-left: 4px solid #00ffa3;
+}
+
+.chat-message.negative {
+  border-left: 4px solid #ff5722;
+}
+
+.chat-message.neutral {
+  border-left: 4px solid #9ca3af;
+}
+
+.chat-content {
+  font-size: 14px;
   color: #fff;
-  font-size: 0.875rem;
+  margin-bottom: 8px;
+  line-height: 1.5;
 }
 
-.date-input:focus {
-  outline: none;
-  border-color: #00ffa3;
+.chat-time {
+  font-size: 12px;
+  color: #888;
+  text-align: right;
 }
 
-.filter-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.search-btn,
-.reset-btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.search-btn {
-  background-color: #00ffa3;
-  color: #000;
-}
-
-.search-btn:hover {
-  background-color: #00e693;
-}
-
-.reset-btn {
-  background-color: #666;
-  color: #fff;
-}
-
-.reset-btn:hover {
-  background-color: #777;
-}
-
-.chat-loading {
+.loading-state {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 200px;
-  color: #666;
-  font-size: 1rem;
+  color: #888;
+  font-size: 16px;
 }
 
-.channel-loading,
-.channel-placeholder {
+.placeholder-state {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100px;
+  height: 100%;
   color: #666;
-  font-size: 0.875rem;
-  padding: 1rem;
+  font-size: 18px;
   text-align: center;
+}
+
+/* 스크롤바 스타일 */
+.channels-list::-webkit-scrollbar,
+.chats-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.channels-list::-webkit-scrollbar-track,
+.chats-list::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+.channels-list::-webkit-scrollbar-thumb,
+.chats-list::-webkit-scrollbar-thumb {
+  background: #00ffa3;
+  border-radius: 4px;
+}
+
+.channels-list::-webkit-scrollbar-thumb:hover,
+.chats-list::-webkit-scrollbar-thumb:hover {
+  background: #00e693;
 }

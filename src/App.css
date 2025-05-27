@@ -226,30 +226,32 @@ main {
   padding: 0.5rem;
   width: 100%;
   margin-top: 3.5rem;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   height: calc(100vh - 3.5rem);
   display: flex;
   flex-direction: column;
-  padding-bottom: 1rem;
+  padding-bottom: 6rem;
 }
 
 main::-webkit-scrollbar {
-  width: 8px;
+  width: 12px;
 }
 
 main::-webkit-scrollbar-track {
   background: var(--bg-secondary);
-  border-radius: 4px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
 }
 
 main::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
+  background: var(--primary-color);
+  border-radius: 6px;
+  border: 2px solid var(--bg-secondary);
 }
 
 main::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-color);
+  background: var(--primary-hover);
 }
 
 /* Section styles */
