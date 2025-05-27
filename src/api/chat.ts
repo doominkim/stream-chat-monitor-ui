@@ -100,3 +100,39 @@ export const getTranscripts = async (
     return [];
   }
 };
+
+export interface FindChatDto {
+  uuid?: string;
+  chatChannelId?: string;
+  limit?: number;
+  from?: Date;
+  to?: Date;
+  message?: string;
+  userIdHash?: string;
+  nickname?: string;
+  chatType?: ChatType;
+}
+
+export const findChat = async (
+  query: FindChatDto = {}
+): Promise<ChatMessage[]> => {
+  try {
+    const params = {
+      uuid: query.uuid,
+      chatChannelId: query.chatChannelId,
+      limit: query.limit,
+      from: query.from instanceof Date ? query.from.toISOString() : query.from,
+      to: query.to instanceof Date ? query.to.toISOString() : query.to,
+      message: query.message,
+      userIdHash: query.userIdHash,
+      nickname: query.nickname,
+      chatType: query.chatType,
+    };
+
+    const response = await apiClient.get<ChatResponse>("/chat", { params });
+    return response.data.items;
+  } catch (error) {
+    console.error("채팅 조회 실패:", error);
+    return [];
+  }
+};

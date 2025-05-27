@@ -1,5 +1,19 @@
 import apiClient from "./client";
 
+export interface FindChannelDto {
+  uuid?: string;
+  nickname?: string;
+  userIdHash?: string;
+}
+
+export interface ChannelChatLog {
+  id: number;
+  message: string;
+  timestamp: string;
+  user: string;
+  nickname: string;
+}
+
 export interface Channel {
   id: number;
   uuid: string;
@@ -12,6 +26,7 @@ export interface Channel {
   isAudioCollected: boolean;
   isCaptureCollected: boolean;
   isEnabledAi: boolean;
+  channelChatLogs?: ChannelChatLog[]; // 채팅 로그 배열
   channelLive: {
     id: number;
     liveId: number;
@@ -34,6 +49,24 @@ export const getChannels = async (): Promise<Channel[]> => {
     return response.data;
   } catch (error) {
     console.error("채널 목록 조회 실패:", error);
+    throw error;
+  }
+};
+
+export const findChannels = async (
+  query: FindChannelDto = {}
+): Promise<Channel[]> => {
+  try {
+    const params = {
+      uuid: query.uuid,
+      nickname: query.nickname,
+      userIdHash: query.userIdHash,
+    };
+
+    const response = await apiClient.get("/v2/channel", { params });
+    return response.data;
+  } catch (error) {
+    console.error("채널 검색 실패:", error);
     throw error;
   }
 };
