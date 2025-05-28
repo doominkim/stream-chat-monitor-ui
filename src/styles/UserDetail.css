@@ -231,6 +231,32 @@
   padding: 16px; /* 패딩 줄임 */
   border-bottom: 1px solid #3a3a3a;
   background-color: #2a2a2a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.refresh-button {
+  background-color: #3a3a3a;
+  border: 1px solid #00ffa3;
+  color: #00ffa3;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.refresh-button:hover:not(:disabled) {
+  background-color: rgba(0, 255, 163, 0.1);
+  transform: translateY(-1px);
+}
+
+.refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .chat-filters {

@@ -118,8 +118,10 @@ const UserDetail: React.FC = () => {
   const [channelsLoading, setChannelsLoading] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const chatListRef = useRef<HTMLDivElement>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const loadChannels = async (userNickname: string) => {
     setChannelsLoading(true);
@@ -168,11 +170,18 @@ const UserDetail: React.FC = () => {
       from?: Date;
       to?: Date;
       nickname?: string;
-    }
+    },
+    isManualRefresh = false
   ) => {
     if (!channel || !userId) return;
 
-    setLoading(true);
+    // 수동 새로고침이 아닌 경우 (자동 업데이트) 깜박임 방지
+    if (isManualRefresh) {
+      setLoading(true);
+    } else {
+      setIsRefreshing(true);
+    }
+
     try {
       const chatData = await findChat({
         uuid: channel.uuid,
@@ -201,13 +210,46 @@ const UserDetail: React.FC = () => {
       console.error("채팅 메시지 로딩 실패:", error);
       setChatMessages([]);
     } finally {
-      setLoading(false);
+      if (isManualRefresh) {
+        setLoading(false);
+      } else {
+        setIsRefreshing(false);
+      }
     }
   };
 
   const handleChannelSelect = (channel: Channel) => {
     setSelectedChannel(channel);
-    loadChatMessages(channel);
+    loadChatMessages(channel, undefined, true); // 초기 로드는 수동으로 처리
+    startRealTimeUpdates(channel);
+  };
+
+  const startRealTimeUpdates = (channel: Channel) => {
+    // 기존 인터벌 정리
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    // 3초마다 채팅 업데이트
+    intervalRef.current = setInterval(() => {
+      if (!loading && !isRefreshing) {
+        // 로딩 중이거나 새로고침 중이 아닐 때만 업데이트
+        loadChatMessages(
+          channel,
+          {
+            message: searchQuery || undefined,
+          },
+          false
+        ); // 자동 업데이트이므로 false
+      }
+    }, 3000);
+  };
+
+  const stopRealTimeUpdates = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
   };
 
   const handleSearch = () => {
@@ -217,13 +259,26 @@ const UserDetail: React.FC = () => {
       message: searchQuery || undefined,
     };
 
-    loadChatMessages(selectedChannel, filters);
+    loadChatMessages(selectedChannel, filters, true); // 검색은 수동으로 처리
+    // 검색 후 실시간 업데이트 재시작
+    startRealTimeUpdates(selectedChannel);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSearch();
     }
+  };
+
+  const handleManualRefresh = () => {
+    if (!selectedChannel) return;
+    loadChatMessages(
+      selectedChannel,
+      {
+        message: searchQuery || undefined,
+      },
+      true
+    );
   };
 
   useEffect(() => {
@@ -233,6 +288,7 @@ const UserDetail: React.FC = () => {
     }
     return () => {
       document.title = "스트림 채팅 모니터";
+      stopRealTimeUpdates(); // 컴포넌트 언마운트 시 인터벌 정리
     };
   }, [userId]);
 
@@ -242,6 +298,13 @@ const UserDetail: React.FC = () => {
       chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
     }
   }, [chatMessages]);
+
+  // 채널 변경 시 이전 인터벌 정리
+  useEffect(() => {
+    return () => {
+      stopRealTimeUpdates();
+    };
+  }, [selectedChannel]);
 
   return (
     <div className="user-detail-page">
@@ -328,6 +391,18 @@ const UserDetail: React.FC = () => {
             <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 600 }}>
               {selectedChannel ? `${selectedChannel.channelName} 채팅` : "채팅"}
             </h2>
+            <button
+              className="refresh-button"
+              onClick={handleManualRefresh}
+              disabled={loading || isRefreshing}
+              title="채팅 새로고침"
+            >
+              {loading
+                ? "새로고침 중..."
+                : isRefreshing
+                ? "자동 업데이트 중..."
+                : "🔄"}
+            </button>
           </div>
           <div className="chat-filters">
             <input
