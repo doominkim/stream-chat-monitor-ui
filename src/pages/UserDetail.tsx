@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { findChat } from "../api/chat";
 import {
@@ -131,8 +131,11 @@ const UserDetail: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<ChannelSortOrder>(
     ChannelSortOrder.DESC
   );
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const chatListRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const loadChannels = async (userNickname: string) => {
     setChannelsLoading(true);
@@ -176,77 +179,87 @@ const UserDetail: React.FC = () => {
     }
   };
 
-  const loadChatMessages = async (
-    channel: Channel,
-    filters?: {
-      message?: string;
-      from?: Date;
-      to?: Date;
-      nickname?: string;
-    },
-    isManualRefresh = false
-  ) => {
-    if (!channel || !userId) return;
+  const loadChatMessages = useCallback(
+    async (
+      channel: Channel,
+      filters?: {
+        message?: string;
+        from?: Date;
+        to?: Date;
+        nickname?: string;
+      },
+      isManualRefresh = false
+    ) => {
+      if (!channel || !userId) return;
 
-    // 수동 새로고침이 아닌 경우 (자동 업데이트) 깜박임 방지
-    if (isManualRefresh) {
-      setLoading(true);
-    } else {
-      setIsRefreshing(true);
-    }
-
-    try {
-      const chatData = await findChat({
-        uuid: channel.uuid,
-        limit: 50,
-        message: filters?.message,
-        from: filters?.from,
-        to: filters?.to,
-        nickname: userId,
-      });
-
-      // API 데이터를 UI 데이터 형식으로 변환
-      const transformedMessages: ChatMessage[] = chatData.map((msg, index) => {
-        const apiMsg = msg as ApiChatMessage; // API 응답에 추가 필드가 있을 수 있음
-        return {
-          id: `${channel.uuid}-${index}`,
-          content: msg.message,
-          timestamp: msg.createdAt, // createdAt을 timestamp로 사용
-          sentiment: "neutral" as const, // 기본값으로 설정
-          nickname: msg.nickname || "익명", // nickname 추가, 없으면 기본값
-          profile: apiMsg.profile || undefined, // profile 정보 추가
-        };
-      });
-
-      setChatMessages(transformedMessages);
-    } catch (error) {
-      console.error("채팅 메시지 로딩 실패:", error);
-      setChatMessages([]);
-    } finally {
+      // 수동 새로고침이 아닌 경우 (자동 업데이트) 깜박임 방지
       if (isManualRefresh) {
-        setLoading(false);
+        setLoading(true);
       } else {
-        setIsRefreshing(false);
+        setIsRefreshing(true);
       }
-    }
-  };
 
-  const handleChannelSelect = (channel: Channel) => {
-    setSelectedChannel(channel);
-    loadChatMessages(channel, undefined, true); // 초기 로드는 수동으로 처리
-    startRealTimeUpdates(channel);
-  };
+      try {
+        const chatData = await findChat({
+          uuid: channel.uuid,
+          limit: 50,
+          message: filters?.message,
+          from: filters?.from,
+          to: filters?.to,
+          nickname: userId,
+        });
 
-  const startRealTimeUpdates = (channel: Channel) => {
-    // 기존 인터벌 정리
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
+        // API 데이터를 UI 데이터 형식으로 변환
+        const transformedMessages: ChatMessage[] = chatData.map(
+          (msg, index) => {
+            const apiMsg = msg as ApiChatMessage; // API 응답에 추가 필드가 있을 수 있음
+            return {
+              id: `${channel.uuid}-${index}`,
+              content: msg.message,
+              timestamp: msg.createdAt, // createdAt을 timestamp로 사용
+              sentiment: "neutral" as const, // 기본값으로 설정
+              nickname: msg.nickname || "익명", // nickname 추가, 없으면 기본값
+              profile: apiMsg.profile || undefined, // profile 정보 추가
+            };
+          }
+        );
 
-    // 3초마다 채팅 업데이트
-    intervalRef.current = setInterval(() => {
-      if (!loading && !isRefreshing) {
-        // 로딩 중이거나 새로고침 중이 아닐 때만 업데이트
+        setChatMessages(transformedMessages);
+      } catch (error) {
+        console.error("채팅 메시지 로딩 실패:", error);
+        setChatMessages([]);
+      } finally {
+        if (isManualRefresh) {
+          setLoading(false);
+        } else {
+          setIsRefreshing(false);
+        }
+      }
+    },
+    [userId]
+  );
+
+  const startRealTimeUpdates = useCallback(
+    (channel: Channel) => {
+      // 기존 인터벌 정리
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+
+      // 라이브 중이 아니면 자동 업데이트 안 함
+      if (!channel.openLive) {
+        console.log(
+          "라이브 중이 아니므로 자동 업데이트 비활성화:",
+          channel.channelName
+        );
+        return;
+      }
+
+      console.log("자동 업데이트 시작:", channel.channelName);
+
+      // 3초마다 채팅 업데이트
+      intervalRef.current = setInterval(() => {
+        console.log("자동 업데이트 실행 중...");
         loadChatMessages(
           channel,
           {
@@ -254,18 +267,26 @@ const UserDetail: React.FC = () => {
           },
           false
         ); // 자동 업데이트이므로 false
-      }
-    }, 3000);
-  };
+      }, 3000);
+    },
+    [loadChatMessages, searchQuery]
+  );
 
-  const stopRealTimeUpdates = () => {
+  const stopRealTimeUpdates = useCallback(() => {
     if (intervalRef.current) {
+      console.log("자동 업데이트 중지");
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+  }, []);
+
+  const handleChannelSelect = (channel: Channel) => {
+    setSelectedChannel(channel);
+    loadChatMessages(channel, undefined, true); // 초기 로드는 수동으로 처리
+    startRealTimeUpdates(channel);
   };
 
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
     if (!selectedChannel) return;
 
     const filters = {
@@ -275,7 +296,7 @@ const UserDetail: React.FC = () => {
     loadChatMessages(selectedChannel, filters, true); // 검색은 수동으로 처리
     // 검색 후 실시간 업데이트 재시작
     startRealTimeUpdates(selectedChannel);
-  };
+  }, [selectedChannel, searchQuery, loadChatMessages, startRealTimeUpdates]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -283,7 +304,7 @@ const UserDetail: React.FC = () => {
     }
   };
 
-  const handleManualRefresh = () => {
+  const handleManualRefresh = useCallback(() => {
     if (!selectedChannel) return;
     loadChatMessages(
       selectedChannel,
@@ -292,7 +313,46 @@ const UserDetail: React.FC = () => {
       },
       true
     );
-  };
+  }, [selectedChannel, searchQuery, loadChatMessages]);
+
+  // 스크롤 감지 함수
+  const handleScroll = useCallback(() => {
+    if (!chatListRef.current) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = chatListRef.current;
+    const isAtBottom = scrollHeight - scrollTop - clientHeight < 10; // 10px 여유
+
+    setShowScrollToBottom(!isAtBottom);
+
+    // 사용자가 스크롤을 올렸는지 감지
+    if (!isAtBottom) {
+      setIsUserScrolling(true);
+
+      // 스크롤 타이머 리셋
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+
+      // 3초 후 자동 스크롤 재개 (사용자가 더 이상 스크롤하지 않으면)
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsUserScrolling(false);
+      }, 3000);
+    } else {
+      setIsUserScrolling(false);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    }
+  }, []);
+
+  // 맨 아래로 스크롤하는 함수
+  const scrollToBottom = useCallback(() => {
+    if (chatListRef.current) {
+      chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
+      setIsUserScrolling(false);
+      setShowScrollToBottom(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (userId) {
@@ -303,21 +363,33 @@ const UserDetail: React.FC = () => {
       document.title = "스트림 채팅 모니터";
       stopRealTimeUpdates(); // 컴포넌트 언마운트 시 인터벌 정리
     };
-  }, [userId]);
+  }, [userId, sortBy, sortOrder, stopRealTimeUpdates]);
 
-  // 채팅 메시지가 업데이트될 때마다 맨 아래로 스크롤
+  // 채팅 메시지가 업데이트될 때마다 맨 아래로 스크롤 (사용자가 스크롤 중이 아닐 때만)
   useEffect(() => {
-    if (chatMessages.length > 0 && chatListRef.current) {
+    if (chatMessages.length > 0 && chatListRef.current && !isUserScrolling) {
       chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
     }
-  }, [chatMessages]);
+  }, [chatMessages, isUserScrolling]);
 
-  // 채널 변경 시 이전 인터벌 정리
+  // 선택된 채널이 변경될 때 자동 업데이트 재시작
   useEffect(() => {
+    if (selectedChannel) {
+      startRealTimeUpdates(selectedChannel);
+    }
     return () => {
       stopRealTimeUpdates();
     };
-  }, [selectedChannel]);
+  }, [selectedChannel, startRealTimeUpdates, stopRealTimeUpdates]);
+
+  // 컴포넌트 언마운트 시 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="user-detail-page">
@@ -480,7 +552,7 @@ const UserDetail: React.FC = () => {
               onKeyDown={handleKeyDown}
             />
           </div>
-          <div className="chats-list" ref={chatListRef}>
+          <div className="chats-list" ref={chatListRef} onScroll={handleScroll}>
             {loading ? (
               <div className="loading-state">채팅을 불러오는 중...</div>
             ) : chatMessages.length > 0 ? (
@@ -575,6 +647,15 @@ const UserDetail: React.FC = () => {
               <div className="placeholder-state">채널을 선택해주세요</div>
             )}
           </div>
+          {showScrollToBottom && (
+            <button
+              className="scroll-to-bottom-btn"
+              onClick={scrollToBottom}
+              title="맨 아래로 이동"
+            >
+              ↓
+            </button>
+          )}
         </div>
       </div>
     </div>
