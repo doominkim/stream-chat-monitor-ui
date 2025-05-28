@@ -1,9 +1,22 @@
 import apiClient from "./client";
 
+export enum ChannelSortField {
+  FOLLOWER = "follower",
+  OPEN_LIVE = "openLive",
+  CHAT_CREATED_AT = "chatCreatedAt",
+}
+
+export enum ChannelSortOrder {
+  ASC = "ASC",
+  DESC = "DESC",
+}
+
 export interface FindChannelDto {
   uuid?: string;
   nickname?: string;
   userIdHash?: string;
+  sortBy?: ChannelSortField;
+  sortOrder?: ChannelSortOrder;
 }
 
 export interface ChannelChatLog {
@@ -61,6 +74,8 @@ export const findChannels = async (
       uuid: query.uuid,
       nickname: query.nickname,
       userIdHash: query.userIdHash,
+      sortBy: query.sortBy,
+      sortOrder: query.sortOrder,
     };
 
     const response = await apiClient.get("/v2/channel", { params });

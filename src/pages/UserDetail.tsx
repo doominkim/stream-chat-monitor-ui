@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { findChat } from "../api/chat";
-import { findChannels, Channel as APIChannel } from "../api/channel";
+import {
+  findChannels,
+  Channel as APIChannel,
+  ChannelSortField,
+  ChannelSortOrder,
+} from "../api/channel";
 import "../styles/UserDetail.css";
 
 interface User {
@@ -120,6 +125,12 @@ const UserDetail: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<ChannelSortField>(
+    ChannelSortField.CHAT_CREATED_AT
+  );
+  const [sortOrder, setSortOrder] = useState<ChannelSortOrder>(
+    ChannelSortOrder.DESC
+  );
   const chatListRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -128,6 +139,8 @@ const UserDetail: React.FC = () => {
     try {
       const channelData = await findChannels({
         nickname: userNickname,
+        sortBy,
+        sortOrder,
       });
 
       // API 데이터를 UI 데이터 형식으로 변환
@@ -331,6 +344,35 @@ const UserDetail: React.FC = () => {
             <div className="channels-title">채팅 채널</div>
             <div className="channels-count">
               {channelsLoading ? "로딩 중..." : `${channels.length}개의 채널`}
+            </div>
+            <div className="channels-sort">
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(e.target.value as ChannelSortField);
+                  if (userId) loadChannels(userId);
+                }}
+                className="sort-select"
+              >
+                <option value={ChannelSortField.CHAT_CREATED_AT}>
+                  최신 채팅순
+                </option>
+                <option value={ChannelSortField.FOLLOWER}>팔로워순</option>
+                <option value={ChannelSortField.OPEN_LIVE}>
+                  라이브 상태순
+                </option>
+              </select>
+              <select
+                value={sortOrder}
+                onChange={(e) => {
+                  setSortOrder(e.target.value as ChannelSortOrder);
+                  if (userId) loadChannels(userId);
+                }}
+                className="sort-select"
+              >
+                <option value={ChannelSortOrder.DESC}>내림차순</option>
+                <option value={ChannelSortOrder.ASC}>오름차순</option>
+              </select>
             </div>
           </div>
           <div className="channels-list">

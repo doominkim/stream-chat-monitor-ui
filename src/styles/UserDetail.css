@@ -112,6 +112,34 @@
   margin-top: 8px;
 }
 
+.channels-sort {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.sort-select {
+  background-color: #3a3a3a;
+  border: 1px solid #555;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: #00ffa3;
+}
+
+.sort-select:hover {
+  border-color: #00ffa3;
+  background-color: rgba(0, 255, 163, 0.05);
+}
+
 .channels-list {
   flex: 1;
   overflow-y: auto;
