@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { findChat } from "../api/chat";
 import { findChannels, Channel as APIChannel } from "../api/channel";
@@ -18,9 +18,9 @@ interface Channel {
   uuid: string;
   channelName: string;
   channelImageUrl: string;
-  follower: number;
   openLive: boolean;
   chatCount: number;
+  lastChatDate?: string;
 }
 
 interface ActivityBadge {
@@ -41,6 +41,11 @@ interface StreamingProperty {
 interface Profile {
   activityBadges?: ActivityBadge[];
   streamingProperty?: StreamingProperty;
+}
+
+interface ExtendedChannelChatLog {
+  createdAt: string;
+  [key: string]: unknown;
 }
 
 interface ApiChatMessage {
@@ -114,6 +119,7 @@ const UserDetail: React.FC = () => {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const chatListRef = useRef<HTMLDivElement>(null);
 
   const loadChannels = async (userNickname: string) => {
     setChannelsLoading(true);
@@ -124,14 +130,26 @@ const UserDetail: React.FC = () => {
 
       // API 데이터를 UI 데이터 형식으로 변환
       const transformedChannels: Channel[] = channelData.map(
-        (channel: APIChannel) => ({
-          uuid: channel.uuid,
-          channelName: channel.channelName,
-          channelImageUrl: channel.channelImageUrl,
-          follower: channel.follower,
-          openLive: channel.openLive,
-          chatCount: channel.channelChatLogs?.length || 0, // channelChatLogs.length 사용
-        })
+        (channel: APIChannel) => {
+          // 마지막 채팅 날짜 추출
+          const lastChatDate =
+            channel.channelChatLogs && channel.channelChatLogs.length > 0
+              ? (
+                  channel.channelChatLogs[
+                    channel.channelChatLogs.length - 1
+                  ] as unknown as ExtendedChannelChatLog
+                ).createdAt
+              : undefined;
+
+          return {
+            uuid: channel.uuid,
+            channelName: channel.channelName,
+            channelImageUrl: channel.channelImageUrl,
+            openLive: channel.openLive,
+            chatCount: channel.channelChatLogs?.length || 0, // channelChatLogs.length 사용
+            lastChatDate: lastChatDate,
+          };
+        }
       );
 
       setChannels(transformedChannels);
@@ -218,6 +236,13 @@ const UserDetail: React.FC = () => {
     };
   }, [userId]);
 
+  // 채팅 메시지가 업데이트될 때마다 맨 아래로 스크롤
+  useEffect(() => {
+    if (chatMessages.length > 0 && chatListRef.current) {
+      chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
+
   return (
     <div className="user-detail-page">
       <div className="user-profile-section">
@@ -274,8 +299,19 @@ const UserDetail: React.FC = () => {
                     <div className="channel-details">
                       <div className="channel-name">{channel.channelName}</div>
                       <div className="channel-meta">
-                        <span>팔로워 {channel.follower.toLocaleString()}</span>
                         <span>채팅 {channel.chatCount}개</span>
+                        {channel.lastChatDate && (
+                          <span>
+                            최근:{" "}
+                            {new Date(channel.lastChatDate).toLocaleDateString(
+                              "ko-KR",
+                              {
+                                month: "short",
+                                day: "numeric",
+                              }
+                            )}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -303,7 +339,7 @@ const UserDetail: React.FC = () => {
               onKeyDown={handleKeyDown}
             />
           </div>
-          <div className="chats-list">
+          <div className="chats-list" ref={chatListRef}>
             {loading ? (
               <div className="loading-state">채팅을 불러오는 중...</div>
             ) : chatMessages.length > 0 ? (
