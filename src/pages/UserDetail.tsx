@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { findChat } from "../api/chat";
+import { findChat, ChatType } from "../api/chat";
 import {
   findChannels,
   Channel as APIChannel,
@@ -26,6 +26,20 @@ interface Channel {
   openLive: boolean;
   chatCount: number;
   lastChatDate?: string;
+  channelLive?: {
+    id: number;
+    liveId: number;
+    liveTitle: string;
+    chatChannelId: string | null;
+    chatActive: boolean;
+    status: boolean;
+    liveCategory: {
+      id: number;
+      categoryType: string;
+      liveCategory: string;
+      liveCategoryValue: string;
+    };
+  };
 }
 
 interface ActivityBadge {
@@ -59,7 +73,26 @@ interface ApiChatMessage {
   message: string;
   timestamp: string;
   createdAt: string;
+  chatType?: ChatType;
+  extras?: {
+    payAmount?: number;
+    [key: string]: unknown;
+  };
   profile?: Profile;
+  channelLive?: {
+    id: number;
+    liveId: number;
+    liveTitle: string;
+    chatChannelId: string | null;
+    chatActive: boolean;
+    status: boolean;
+    liveCategory: {
+      id: number;
+      categoryType: string;
+      liveCategory: string;
+      liveCategoryValue: string;
+    };
+  };
 }
 
 interface ChatMessage {
@@ -68,7 +101,18 @@ interface ChatMessage {
   timestamp: string;
   sentiment: "positive" | "negative" | "neutral";
   nickname?: string;
+  chatType?: ChatType;
+  extras?: {
+    payAmount?: number;
+    [key: string]: unknown;
+  };
   profile?: Profile;
+  channelLive?: {
+    liveTitle: string;
+    liveCategory: {
+      liveCategoryValue: string;
+    };
+  };
 }
 
 const mockUser: User = {
@@ -125,6 +169,7 @@ const UserDetail: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [chatTypeFilter, setChatTypeFilter] = useState<ChatType | "ALL">("ALL");
   const [sortBy, setSortBy] = useState<ChannelSortField>(
     ChannelSortField.CHAT_CREATED_AT
   );
@@ -166,6 +211,7 @@ const UserDetail: React.FC = () => {
             openLive: channel.openLive,
             chatCount: channel.channelChatLogs?.length || 0, // channelChatLogs.length 사용
             lastChatDate: lastChatDate,
+            channelLive: channel.channelLive, // channelLive 정보 추가
           };
         }
       );
@@ -187,6 +233,7 @@ const UserDetail: React.FC = () => {
         from?: Date;
         to?: Date;
         nickname?: string;
+        chatType?: ChatType;
       },
       isManualRefresh = false
     ) => {
@@ -207,19 +254,38 @@ const UserDetail: React.FC = () => {
           from: filters?.from,
           to: filters?.to,
           nickname: userId,
+          chatType: filters?.chatType,
         });
 
         // API 데이터를 UI 데이터 형식으로 변환
         const transformedMessages: ChatMessage[] = chatData.map(
           (msg, index) => {
             const apiMsg = msg as ApiChatMessage; // API 응답에 추가 필드가 있을 수 있음
+
+            console.log("채팅 메시지 변환:", {
+              message: msg.message,
+              channelLive: apiMsg.channelLive,
+              hasChannelLive: !!apiMsg.channelLive,
+            });
+
             return {
               id: `${channel.uuid}-${index}`,
               content: msg.message,
               timestamp: msg.createdAt, // createdAt을 timestamp로 사용
               sentiment: "neutral" as const, // 기본값으로 설정
               nickname: msg.nickname || "익명", // nickname 추가, 없으면 기본값
+              chatType: apiMsg.chatType || undefined, // chatType 정보 추가
+              extras: apiMsg.extras || undefined, // extras 정보 추가
               profile: apiMsg.profile || undefined, // profile 정보 추가
+              channelLive: apiMsg.channelLive
+                ? {
+                    liveTitle: apiMsg.channelLive.liveTitle,
+                    liveCategory: {
+                      liveCategoryValue:
+                        apiMsg.channelLive.liveCategory.liveCategoryValue,
+                    },
+                  }
+                : undefined, // API 응답의 channelLive 사용
             };
           }
         );
@@ -274,12 +340,13 @@ const UserDetail: React.FC = () => {
           channel,
           {
             message: searchQuery || undefined,
+            chatType: chatTypeFilter !== "ALL" ? chatTypeFilter : undefined,
           },
           false
         ); // 자동 업데이트이므로 false
       }, 3000);
     },
-    [loadChatMessages, searchQuery]
+    [loadChatMessages, searchQuery, chatTypeFilter]
   );
 
   const stopRealTimeUpdates = useCallback(() => {
@@ -311,12 +378,19 @@ const UserDetail: React.FC = () => {
 
     const filters = {
       message: searchQuery || undefined,
+      chatType: chatTypeFilter !== "ALL" ? chatTypeFilter : undefined,
     };
 
     loadChatMessages(selectedChannel, filters, true); // 검색은 수동으로 처리
     // 검색 후 실시간 업데이트 재시작
     startRealTimeUpdates(selectedChannel);
-  }, [selectedChannel, searchQuery, loadChatMessages, startRealTimeUpdates]);
+  }, [
+    selectedChannel,
+    searchQuery,
+    chatTypeFilter,
+    loadChatMessages,
+    startRealTimeUpdates,
+  ]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -330,10 +404,11 @@ const UserDetail: React.FC = () => {
       selectedChannel,
       {
         message: searchQuery || undefined,
+        chatType: chatTypeFilter !== "ALL" ? chatTypeFilter : undefined,
       },
       true
     );
-  }, [selectedChannel, searchQuery, loadChatMessages]);
+  }, [selectedChannel, searchQuery, chatTypeFilter, loadChatMessages]);
 
   // 스크롤 감지 함수
   const handleScroll = useCallback(() => {
@@ -559,6 +634,16 @@ const UserDetail: React.FC = () => {
                           </span>
                         )}
                       </div>
+                      {channel.channelLive && (
+                        <div className="channel-live-info">
+                          <span className="live-title">
+                            {channel.channelLive.liveTitle}
+                          </span>
+                          <span className="live-category">
+                            {channel.channelLive.liveCategory.liveCategoryValue}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -598,6 +683,28 @@ const UserDetail: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}
             />
+            <select
+              value={chatTypeFilter}
+              onChange={(e) => {
+                setChatTypeFilter(e.target.value as ChatType | "ALL");
+                if (selectedChannel) {
+                  const filters = {
+                    message: searchQuery || undefined,
+                    chatType:
+                      e.target.value !== "ALL"
+                        ? (e.target.value as ChatType)
+                        : undefined,
+                  };
+                  loadChatMessages(selectedChannel, filters, true);
+                  startRealTimeUpdates(selectedChannel);
+                }
+              }}
+              className="chat-type-filter"
+            >
+              <option value="ALL">전체</option>
+              <option value={ChatType.CHAT}>일반 채팅</option>
+              <option value={ChatType.DONATION}>도네이션</option>
+            </select>
           </div>
           <div className="chats-list" ref={chatListRef} onScroll={handleScroll}>
             {loading ? (
@@ -641,12 +748,29 @@ const UserDetail: React.FC = () => {
                             })
                           : "시간 정보 없음";
 
+                        console.log("채팅 메시지 렌더링:", {
+                          messageId: message.id,
+                          hasChannelLive: !!message.channelLive,
+                          channelLive: message.channelLive,
+                        });
+
                         return (
                           <div
                             key={message.id}
-                            className={`chat-message ${message.sentiment}`}
+                            className={`chat-message ${message.sentiment} ${
+                              message.chatType
+                                ? `chat-type-${message.chatType.toLowerCase()}`
+                                : ""
+                            }`}
                           >
                             <div className="chat-content">
+                              {message.chatType &&
+                                message.chatType !== ChatType.CHAT && (
+                                  <span className="chat-type-icon">
+                                    {message.chatType === ChatType.DONATION &&
+                                      "💰"}
+                                  </span>
+                                )}
                               <span
                                 className="chat-nickname"
                                 style={{
@@ -676,11 +800,31 @@ const UserDetail: React.FC = () => {
                                   )}
                                 {message.nickname}
                               </span>
+                              {message.chatType === ChatType.DONATION &&
+                                message.extras?.payAmount && (
+                                  <span className="donation-amount">
+                                    {message.extras.payAmount.toLocaleString()}
+                                    원
+                                  </span>
+                                )}
                               <span className="chat-text">
                                 {message.content}
                               </span>
                               <span className="chat-time">{formattedTime}</span>
                             </div>
+                            {message.channelLive && (
+                              <div className="chat-live-info">
+                                <span className="chat-live-title">
+                                  {message.channelLive.liveTitle}
+                                </span>
+                                <span className="chat-live-category">
+                                  {
+                                    message.channelLive.liveCategory
+                                      .liveCategoryValue
+                                  }
+                                </span>
+                              </div>
+                            )}
                           </div>
                         );
                       })}
