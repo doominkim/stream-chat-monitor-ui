@@ -387,16 +387,12 @@
 }
 
 .donation-amount {
-  background-color: #ffd700;
-  color: #1a1a1a;
-  padding: 2px 8px;
-  border-radius: 12px;
+  color: #ffd700;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   margin-left: 8px;
   margin-right: 8px;
   flex-shrink: 0;
-  box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
 }
 
 .chats-list {
