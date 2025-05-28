@@ -215,6 +215,12 @@
   flex-wrap: wrap;
   font-size: 0.7rem;
   color: var(--text-secondary);
+  justify-content: space-between;
+}
+
+.last-chat-date {
+  margin-left: auto;
+  font-weight: 500;
 }
 
 .chats-panel {
@@ -245,7 +251,9 @@
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s ease;
-  min-width: 80px;
+  min-width: 140px;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .refresh-button:hover:not(:disabled) {

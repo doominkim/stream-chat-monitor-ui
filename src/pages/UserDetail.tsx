@@ -364,15 +364,37 @@ const UserDetail: React.FC = () => {
                       <div className="channel-meta">
                         <span>채팅 {channel.chatCount}개</span>
                         {channel.lastChatDate && (
-                          <span>
-                            최근:{" "}
-                            {new Date(channel.lastChatDate).toLocaleDateString(
-                              "ko-KR",
-                              {
-                                month: "short",
-                                day: "numeric",
+                          <span className="last-chat-date">
+                            {(() => {
+                              const lastChatDate = new Date(
+                                channel.lastChatDate
+                              );
+                              const today = new Date();
+                              const isToday =
+                                lastChatDate.toDateString() ===
+                                today.toDateString();
+
+                              if (isToday) {
+                                // 오늘인 경우 시간만 표시
+                                return lastChatDate.toLocaleTimeString(
+                                  "ko-KR",
+                                  {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: false,
+                                  }
+                                );
+                              } else {
+                                // 오늘이 아닌 경우 날짜만 표시
+                                return lastChatDate.toLocaleDateString(
+                                  "ko-KR",
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                  }
+                                );
                               }
-                            )}
+                            })()}
                           </span>
                         )}
                       </div>
@@ -395,13 +417,15 @@ const UserDetail: React.FC = () => {
               className="refresh-button"
               onClick={handleManualRefresh}
               disabled={loading || isRefreshing}
-              title="채팅 새로고침"
+              title={
+                loading
+                  ? "새로고침 중..."
+                  : isRefreshing
+                  ? "자동 업데이트 중..."
+                  : "채팅 새로고침"
+              }
             >
-              {loading
-                ? "새로고침 중..."
-                : isRefreshing
-                ? "자동 업데이트 중..."
-                : "🔄"}
+              ⟳ 새로고침
             </button>
           </div>
           <div className="chat-filters">
