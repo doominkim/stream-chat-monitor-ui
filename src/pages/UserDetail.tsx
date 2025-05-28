@@ -131,11 +131,11 @@ const UserDetail: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<ChannelSortOrder>(
     ChannelSortOrder.DESC
   );
-  const [isUserScrolling, setIsUserScrolling] = useState(false);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const chatListRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isUserScrollingRef = useRef<boolean>(false);
 
   const loadChannels = async (userNickname: string) => {
     setChannelsLoading(true);
@@ -246,6 +246,13 @@ const UserDetail: React.FC = () => {
         clearInterval(intervalRef.current);
       }
 
+      console.log(
+        "자동 업데이트 시작 시도:",
+        channel.channelName,
+        "openLive:",
+        channel.openLive
+      );
+
       // 라이브 중이 아니면 자동 업데이트 안 함
       if (!channel.openLive) {
         console.log(
@@ -255,11 +262,14 @@ const UserDetail: React.FC = () => {
         return;
       }
 
-      console.log("자동 업데이트 시작:", channel.channelName);
+      console.log("라이브 중이므로 자동 업데이트 활성화:", channel.channelName);
 
       // 3초마다 채팅 업데이트
       intervalRef.current = setInterval(() => {
-        console.log("자동 업데이트 실행 중...");
+        console.log(
+          "자동 업데이트 실행 중...",
+          new Date().toLocaleTimeString()
+        );
         loadChatMessages(
           channel,
           {
@@ -281,7 +291,17 @@ const UserDetail: React.FC = () => {
   }, []);
 
   const handleChannelSelect = (channel: Channel) => {
+    console.log("채널 선택:", channel.channelName);
     setSelectedChannel(channel);
+    isUserScrollingRef.current = false; // 새 채널 선택 시 자동 스크롤 활성화
+    setShowScrollToBottom(false);
+
+    // 기존 타이머 클리어
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = null;
+    }
+
     loadChatMessages(channel, undefined, true); // 초기 로드는 수동으로 처리
     startRealTimeUpdates(channel);
   };
@@ -320,39 +340,73 @@ const UserDetail: React.FC = () => {
     if (!chatListRef.current) return;
 
     const { scrollTop, scrollHeight, clientHeight } = chatListRef.current;
-    const isAtBottom = scrollHeight - scrollTop - clientHeight < 10; // 10px 여유
+    const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 5; // 5px 여유로 더 정확하게
+
+    console.log("스크롤 상태:", {
+      scrollTop,
+      scrollHeight,
+      clientHeight,
+      diff: scrollHeight - scrollTop - clientHeight,
+      isAtBottom,
+    });
 
     setShowScrollToBottom(!isAtBottom);
 
-    // 사용자가 스크롤을 올렸는지 감지
-    if (!isAtBottom) {
-      setIsUserScrolling(true);
-
-      // 스크롤 타이머 리셋
+    // 맨 아래에 있으면 자동 스크롤 활성화
+    if (isAtBottom) {
+      console.log("맨 아래 도달 - 자동 스크롤 활성화");
+      isUserScrollingRef.current = false;
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = null;
       }
-
-      // 3초 후 자동 스크롤 재개 (사용자가 더 이상 스크롤하지 않으면)
-      scrollTimeoutRef.current = setTimeout(() => {
-        setIsUserScrolling(false);
-      }, 3000);
     } else {
-      setIsUserScrolling(false);
+      // 맨 아래가 아니면 사용자가 스크롤한 것으로 간주
+      console.log("사용자가 스크롤을 올림 - 자동 스크롤 비활성화");
+      isUserScrollingRef.current = true;
+
+      // 기존 타이머 클리어
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
       }
+
+      // 5초 후 자동 스크롤 재개
+      scrollTimeoutRef.current = setTimeout(() => {
+        console.log("5초 경과 - 자동 스크롤 재개");
+        isUserScrollingRef.current = false;
+      }, 5000);
     }
   }, []);
 
   // 맨 아래로 스크롤하는 함수
   const scrollToBottom = useCallback(() => {
     if (chatListRef.current) {
+      console.log("수동으로 맨 아래로 이동");
       chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
-      setIsUserScrolling(false);
+      isUserScrollingRef.current = false;
       setShowScrollToBottom(false);
     }
   }, []);
+
+  // 채팅 메시지가 업데이트될 때마다 맨 아래로 스크롤 (사용자가 스크롤 중이 아닐 때만)
+  useEffect(() => {
+    console.log("채팅 메시지 업데이트:", {
+      messageCount: chatMessages.length,
+      isUserScrolling: isUserScrollingRef.current,
+      shouldAutoScroll: chatMessages.length > 0 && !isUserScrollingRef.current,
+    });
+
+    if (
+      chatMessages.length > 0 &&
+      chatListRef.current &&
+      !isUserScrollingRef.current
+    ) {
+      console.log("자동 스크롤 실행");
+      chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
+    } else if (isUserScrollingRef.current) {
+      console.log("사용자 스크롤 중이므로 자동 스크롤 건너뜀");
+    }
+  }, [chatMessages]);
 
   useEffect(() => {
     if (userId) {
@@ -364,13 +418,6 @@ const UserDetail: React.FC = () => {
       stopRealTimeUpdates(); // 컴포넌트 언마운트 시 인터벌 정리
     };
   }, [userId, sortBy, sortOrder, stopRealTimeUpdates]);
-
-  // 채팅 메시지가 업데이트될 때마다 맨 아래로 스크롤 (사용자가 스크롤 중이 아닐 때만)
-  useEffect(() => {
-    if (chatMessages.length > 0 && chatListRef.current && !isUserScrolling) {
-      chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
-    }
-  }, [chatMessages, isUserScrolling]);
 
   // 선택된 채널이 변경될 때 자동 업데이트 재시작
   useEffect(() => {
