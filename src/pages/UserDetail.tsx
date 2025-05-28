@@ -23,11 +23,42 @@ interface Channel {
   chatCount: number;
 }
 
+interface ActivityBadge {
+  id: string;
+  name: string;
+  imageUrl: string;
+  description?: string;
+}
+
+interface NicknameColor {
+  colorCode: string;
+}
+
+interface StreamingProperty {
+  nicknameColor?: NicknameColor;
+}
+
+interface Profile {
+  activityBadges?: ActivityBadge[];
+  streamingProperty?: StreamingProperty;
+}
+
+interface ApiChatMessage {
+  user: string;
+  nickname: string;
+  message: string;
+  timestamp: string;
+  createdAt: string;
+  profile?: Profile;
+}
+
 interface ChatMessage {
   id: string;
   content: string;
   timestamp: string;
   sentiment: "positive" | "negative" | "neutral";
+  nickname?: string;
+  profile?: Profile;
 }
 
 const mockUser: User = {
@@ -39,6 +70,40 @@ const mockUser: User = {
   tags: ["개악질러", "다크템플러", "전과8범", "채팅왕", "밤샘러"],
   aiAnalysis:
     "이 유저는 주로 밤 10시 이후에 활동하며, 채팅에서 자주 밈을 사용하고 유머러스한 반응을 보입니다. 특히 게임 실패 시 '개악질'이라는 표현을 자주 사용하는 특징이 있습니다. 다크템플러를 주로 플레이하며, 다른 시청자들과 활발한 소통을 하는 편입니다. 가끔 과도한 채팅으로 경고를 받기도 했지만, 전반적으로 긍정적인 채팅 분위기를 만드는 데 기여합니다.",
+};
+
+// 색상 코드 검증 및 정규화 함수
+const normalizeColorCode = (colorCode: string): string => {
+  if (!colorCode) return "#00ffa3";
+
+  // # 제거
+  const cleanCode = colorCode.replace("#", "");
+
+  // 유효한 16진수인지 확인
+  if (!/^[0-9A-Fa-f]+$/.test(cleanCode)) {
+    console.warn(`Invalid color code: ${colorCode}, using default`);
+    return "#00ffa3";
+  }
+
+  // 길이에 따른 처리
+  if (cleanCode.length === 3) {
+    // 3자리 -> 6자리로 확장 (예: F00 -> FF0000)
+    return `#${cleanCode
+      .split("")
+      .map((c) => c + c)
+      .join("")}`;
+  } else if (cleanCode.length === 6) {
+    // 6자리는 그대로
+    return `#${cleanCode}`;
+  } else if (cleanCode.length === 5) {
+    // 5자리는 앞에 0 추가해서 6자리로 (예: CC000 -> 0CC000)
+    console.warn(`5-digit color code detected: ${colorCode}, padding with 0`);
+    return `#0${cleanCode}`;
+  } else {
+    // 기타 잘못된 길이
+    console.warn(`Invalid color code length: ${colorCode}, using default`);
+    return "#00ffa3";
+  }
 };
 
 const UserDetail: React.FC = () => {
@@ -102,17 +167,14 @@ const UserDetail: React.FC = () => {
 
       // API 데이터를 UI 데이터 형식으로 변환
       const transformedMessages: ChatMessage[] = chatData.map((msg, index) => {
-        console.log(
-          "API createdAt:",
-          msg.createdAt,
-          "Type:",
-          typeof msg.createdAt
-        );
+        const apiMsg = msg as ApiChatMessage; // API 응답에 추가 필드가 있을 수 있음
         return {
           id: `${channel.uuid}-${index}`,
           content: msg.message,
           timestamp: msg.createdAt, // createdAt을 timestamp로 사용
           sentiment: "neutral" as const, // 기본값으로 설정
+          nickname: msg.nickname || "익명", // nickname 추가, 없으면 기본값
+          profile: apiMsg.profile || undefined, // profile 정보 추가
         };
       });
 
@@ -255,6 +317,7 @@ const UserDetail: React.FC = () => {
                       day: "2-digit",
                       hour: "2-digit",
                       minute: "2-digit",
+                      hour12: false,
                     })
                   : "시간 정보 없음";
 
@@ -263,8 +326,35 @@ const UserDetail: React.FC = () => {
                     key={message.id}
                     className={`chat-message ${message.sentiment}`}
                   >
-                    <div className="chat-content">{message.content}</div>
-                    <div className="chat-time">{formattedTime}</div>
+                    <div className="chat-content">
+                      <span
+                        className="chat-nickname"
+                        style={{
+                          color: normalizeColorCode(
+                            message.profile?.streamingProperty?.nicknameColor
+                              ?.colorCode || ""
+                          ),
+                        }}
+                      >
+                        {message.profile?.activityBadges &&
+                          message.profile.activityBadges.length > 0 && (
+                            <div className="activity-badges">
+                              {message.profile.activityBadges.map((badge) => (
+                                <img
+                                  key={badge.id}
+                                  src={badge.imageUrl}
+                                  alt={badge.name}
+                                  title={badge.description || badge.name}
+                                  className="activity-badge"
+                                />
+                              ))}
+                            </div>
+                          )}
+                        {message.nickname}
+                      </span>
+                      <span className="chat-text">{message.content}</span>
+                      <span className="chat-time">{formattedTime}</span>
+                    </div>
                   </div>
                 );
               })
