@@ -267,6 +267,24 @@
   scroll-behavior: smooth;
 }
 
+.date-group {
+  margin-bottom: 16px;
+}
+
+.date-card {
+  background-color: #3a3a3a;
+  color: #00ffa3;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  margin: 16px auto 12px auto;
+  max-width: 200px;
+  border: 1px solid #00ffa3;
+  box-shadow: 0 2px 4px rgba(0, 255, 163, 0.1);
+}
+
 .chat-message {
   background-color: #333;
   padding: 8px 12px;

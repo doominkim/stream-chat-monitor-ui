@@ -343,57 +343,91 @@ const UserDetail: React.FC = () => {
             {loading ? (
               <div className="loading-state">채팅을 불러오는 중...</div>
             ) : chatMessages.length > 0 ? (
-              chatMessages.map((message) => {
-                const date = new Date(message.timestamp);
-                const isValidDate = !isNaN(date.getTime());
-                const formattedTime = isValidDate
-                  ? date.toLocaleString("ko-KR", {
-                      year: "numeric",
-                      month: "2-digit",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: false,
-                    })
-                  : "시간 정보 없음";
+              (() => {
+                // 날짜별로 메시지 그룹화
+                const groupedMessages = chatMessages.reduce(
+                  (groups, message) => {
+                    const date = new Date(message.timestamp);
+                    const isValidDate = !isNaN(date.getTime());
+                    const dateKey = isValidDate
+                      ? date.toLocaleDateString("ko-KR", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : "날짜 정보 없음";
 
-                return (
-                  <div
-                    key={message.id}
-                    className={`chat-message ${message.sentiment}`}
-                  >
-                    <div className="chat-content">
-                      <span
-                        className="chat-nickname"
-                        style={{
-                          color: normalizeColorCode(
-                            message.profile?.streamingProperty?.nicknameColor
-                              ?.colorCode || ""
-                          ),
-                        }}
-                      >
-                        {message.profile?.activityBadges &&
-                          message.profile.activityBadges.length > 0 && (
-                            <div className="activity-badges">
-                              {message.profile.activityBadges.map((badge) => (
-                                <img
-                                  key={badge.id}
-                                  src={badge.imageUrl}
-                                  alt={badge.name}
-                                  title={badge.description || badge.name}
-                                  className="activity-badge"
-                                />
-                              ))}
-                            </div>
-                          )}
-                        {message.nickname}
-                      </span>
-                      <span className="chat-text">{message.content}</span>
-                      <span className="chat-time">{formattedTime}</span>
-                    </div>
-                  </div>
+                    if (!groups[dateKey]) {
+                      groups[dateKey] = [];
+                    }
+                    groups[dateKey].push(message);
+                    return groups;
+                  },
+                  {} as Record<string, typeof chatMessages>
                 );
-              })
+
+                return Object.entries(groupedMessages).map(
+                  ([dateKey, messages]) => (
+                    <div key={dateKey} className="date-group">
+                      <div className="date-card">{dateKey}</div>
+                      {messages.map((message) => {
+                        const date = new Date(message.timestamp);
+                        const isValidDate = !isNaN(date.getTime());
+                        const formattedTime = isValidDate
+                          ? date.toLocaleTimeString("ko-KR", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              hour12: false,
+                            })
+                          : "시간 정보 없음";
+
+                        return (
+                          <div
+                            key={message.id}
+                            className={`chat-message ${message.sentiment}`}
+                          >
+                            <div className="chat-content">
+                              <span
+                                className="chat-nickname"
+                                style={{
+                                  color: normalizeColorCode(
+                                    message.profile?.streamingProperty
+                                      ?.nicknameColor?.colorCode || ""
+                                  ),
+                                }}
+                              >
+                                {message.profile?.activityBadges &&
+                                  message.profile.activityBadges.length > 0 && (
+                                    <div className="activity-badges">
+                                      {message.profile.activityBadges.map(
+                                        (badge) => (
+                                          <img
+                                            key={badge.id}
+                                            src={badge.imageUrl}
+                                            alt={badge.name}
+                                            title={
+                                              badge.description || badge.name
+                                            }
+                                            className="activity-badge"
+                                          />
+                                        )
+                                      )}
+                                    </div>
+                                  )}
+                                {message.nickname}
+                              </span>
+                              <span className="chat-text">
+                                {message.content}
+                              </span>
+                              <span className="chat-time">{formattedTime}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )
+                );
+              })()
             ) : selectedChannel ? (
               <div className="placeholder-state">채팅이 없습니다</div>
             ) : (
