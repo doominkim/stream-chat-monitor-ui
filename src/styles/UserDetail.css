@@ -118,37 +118,49 @@
   padding: 12px; /* 패딩 줄임 */
 }
 
-.channel-item {
-  background-color: #333;
-  padding: 16px;
-  border-radius: 8px;
+.channel-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-bottom: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 0.1rem; /* App.css와 동일한 여백 */
 }
 
-.channel-item:hover {
-  background-color: #3a3a3a;
-  transform: translateY(-2px);
+.channel-card:last-child {
+  margin-bottom: 0;
 }
 
-.channel-item.selected {
-  background-color: #404040;
-  border: 1px solid #00ffa3;
+.channel-card:hover {
+  border-color: var(--primary-color);
+  background-color: rgba(0, 255, 163, 0.05);
+  transform: translateX(4px);
+}
+
+.channel-card.selected {
+  border-color: var(--primary-color);
+  background-color: rgba(0, 255, 163, 0.1);
 }
 
 .channel-info {
   display: flex;
+  gap: 0.75rem;
   align-items: center;
-  gap: 12px;
+  min-width: 0;
+  position: relative;
 }
 
 .channel-avatar {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
+  position: relative;
+  border: 2px solid transparent;
 }
 
 .channel-avatar img {
@@ -157,27 +169,52 @@
   object-fit: cover;
 }
 
+.channel-avatar.live {
+  background: linear-gradient(var(--bg-secondary), var(--bg-secondary))
+      padding-box,
+    linear-gradient(45deg, #00ffa3, #006f5f) border-box;
+}
+
 .channel-details {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .channel-name {
-  font-weight: 500;
-  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 4px;
-  font-size: 16px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.channel-category {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  letter-spacing: -0.5px;
 }
 
 .channel-meta {
   display: flex;
+  gap: 0.5rem;
   align-items: center;
-  gap: 12px;
-  font-size: 14px;
-  color: #888;
+  flex-wrap: wrap;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
 }
 
 .chats-panel {

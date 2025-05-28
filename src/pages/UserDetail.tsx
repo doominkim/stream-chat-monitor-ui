@@ -190,17 +190,21 @@ const UserDetail: React.FC = () => {
               channels.map((channel) => (
                 <div
                   key={channel.uuid}
-                  className={`channel-item ${
+                  className={`channel-card ${
                     selectedChannel?.uuid === channel.uuid ? "selected" : ""
                   }`}
                   onClick={() => handleChannelSelect(channel)}
                 >
                   <div className="channel-info">
-                    <div className="channel-avatar">
+                    <div
+                      className={`channel-avatar ${
+                        channel.openLive ? "live" : ""
+                      }`}
+                    >
                       <img
                         src={
                           channel.channelImageUrl ||
-                          "https://via.placeholder.com/48"
+                          "https://via.placeholder.com/40"
                         }
                         alt={channel.channelName}
                       />
@@ -210,9 +214,6 @@ const UserDetail: React.FC = () => {
                       <div className="channel-meta">
                         <span>팔로워 {channel.follower.toLocaleString()}</span>
                         <span>채팅 {channel.chatCount}개</span>
-                        {channel.openLive && (
-                          <span style={{ color: "#ff6b6b" }}>● LIVE</span>
-                        )}
                       </div>
                     </div>
                   </div>
