@@ -36,7 +36,6 @@ export enum ChatType {
   CHAT = "CHAT",
   DONATION = "DONATION",
   SUBSCRIPTION = "SUBSCRIPTION",
-  GIFT = "GIFT",
 }
 
 export interface FindChannelChatDto {
