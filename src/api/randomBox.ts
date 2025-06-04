@@ -1,4 +1,3 @@
-import { Channel } from "./channel";
 
 export interface BoxItem {
   id: number;
