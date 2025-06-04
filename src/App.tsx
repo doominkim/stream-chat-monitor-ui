@@ -15,6 +15,7 @@ import UserDetail from "./pages/UserDetail";
 import ChatHistory from "./pages/ChatHistory";
 import Subtitle from "./pages/Subtitle";
 import RandomBox from "./pages/RandomBox";
+import ClipGenerator from "./pages/ClipGenerator";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import HealthStatus from "./components/HealthStatus";
@@ -43,6 +44,8 @@ function PageTitle() {
           return "자막";
         case "/random-box":
           return "랜덤 박스";
+        case "/clip-generator":
+          return "클립 생성기";
         default:
           return "홈";
       }
@@ -147,6 +150,7 @@ function AppContent() {
           <Route path="/user/:userId/chat" element={<ChatHistory />} />
           <Route path="/subtitle" element={<Subtitle />} />
           <Route path="/random-box" element={<RandomBox />} />
+          <Route path="/clip-generator" element={<ClipGenerator />} />
           <Route path="/" element={<Navigate to="/subtitle" replace />} />
         </Routes>
       </main>
