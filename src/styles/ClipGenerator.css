@@ -1,0 +1,54 @@
+.clip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+  padding-top: 1rem;
+}
+
+.clip-item {
+  display: flex;
+  gap: 1rem;
+  background-color: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.clip-thumb img {
+  width: 160px;
+  height: 90px;
+  object-fit: cover;
+  display: block;
+}
+
+.clip-info {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  flex: 1;
+}
+
+.clip-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.clip-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.clip-link:hover {
+  text-decoration: underline;
+}
+
+.clip-time {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: auto;
+}

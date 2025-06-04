@@ -116,3 +116,23 @@ export const getTranscripts = async (
     throw error;
   }
 };
+
+export interface Clip {
+  id: number;
+  createdAt: string;
+  title: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+}
+
+export const getClips = async (
+  channelId: string
+): Promise<Clip[]> => {
+  try {
+    const response = await apiClient.get(`/channel/${channelId}/clip`);
+    return response.data;
+  } catch (error) {
+    console.error("클립 조회 실패:", error);
+    throw error;
+  }
+};

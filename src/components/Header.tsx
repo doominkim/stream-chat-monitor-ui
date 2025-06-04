@@ -7,6 +7,7 @@ const Header = () => {
     location.pathname.startsWith("/user");
   const isSubtitlePage = location.pathname.startsWith("/subtitle");
   const isRandomBoxPage = location.pathname.startsWith("/random-box");
+  const isClipPage = location.pathname.startsWith("/clip-generator");
 
   return (
     <header>
@@ -30,6 +31,12 @@ const Header = () => {
               className={`dropdown-trigger ${isRandomBoxPage ? "active" : ""}`}
             >
               후원 랜덤박스
+            </Link>
+            <Link
+              to="/clip-generator"
+              className={`dropdown-trigger ${isClipPage ? "active" : ""}`}
+            >
+              AI 클립생성기
             </Link>
           </div>
         </div>
