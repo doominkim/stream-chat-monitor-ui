@@ -6,8 +6,9 @@ import type {
   ChzzkTokenResponse,
 } from "../../types/chzzk";
 
-const CHZZK_AUTH_URL = "https://chzzk.naver.com/account-interlock";
-const CHZZK_TOKEN_URL = "https://api.chzzk.com/auth/v1/token";
+export const CHZZK_AUTH_URL = "https://chzzk.naver.com/account-interlock";
+const CHZZK_TOKEN_URL = "https://chzzk.naver.com/auth/v1/token";
+const CHZZK_TOKEN_REVOKE_URL = "https://chzzk.naver.com/auth/v1/token/revoke";
 
 export const requestAuthCode = async (
   params: ChzzkAuthRequest
@@ -36,4 +37,18 @@ export const refreshToken = async (
     grantType: "refresh_token",
   });
   return response.data;
+};
+
+export const revokeToken = async (
+  clientId: string,
+  clientSecret: string,
+  token: string,
+  tokenTypeHint: "access_token" | "refresh_token" = "access_token"
+): Promise<void> => {
+  await axios.post(CHZZK_TOKEN_REVOKE_URL, {
+    clientId,
+    clientSecret,
+    token,
+    tokenTypeHint,
+  });
 };

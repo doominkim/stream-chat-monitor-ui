@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { requestAuthCode } from "../api/chzzk/auth";
+import { CHZZK_AUTH_URL } from "../api/chzzk/auth";
 
 const Header = () => {
   const location = useLocation();
@@ -11,23 +11,14 @@ const Header = () => {
   const isClipPage = location.pathname.startsWith("/clip-generator");
 
   const handleChzzkLogin = async () => {
-    try {
-      const clientId = import.meta.env.VITE_CHZZK_CLIENT_ID;
-      const redirectUri = `${window.location.origin}/login/callback`;
-      const state = crypto.randomUUID();
+    const clientId = import.meta.env.VITE_CHZZK_CLIENT_ID;
+    const redirectUri = "https://ping-pong.world/login/callback";
+    const state = `${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    localStorage.setItem("chzzk_oauth_state", state);
 
-      await requestAuthCode({
-        clientId,
-        redirectUri,
-        state,
-      });
-
-      window.location.href = `https://chzzk.naver.com/account-interlock?clientId=${clientId}&redirectUri=${encodeURIComponent(
-        redirectUri
-      )}&state=${state}`;
-    } catch (error) {
-      console.error("치지직 로그인 요청 실패:", error);
-    }
+    window.location.href = `${CHZZK_AUTH_URL}?clientId=${clientId}&redirectUri=${encodeURIComponent(
+      redirectUri
+    )}&state=${state}`;
   };
 
   return (

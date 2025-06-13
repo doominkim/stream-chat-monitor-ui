@@ -9,6 +9,7 @@ import {
 import { FaDesktop } from "react-icons/fa";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import Login from "./pages/Login";
+import LoginCallback from "./pages/LoginCallback";
 import Dashboard from "./pages/Dashboard";
 import SearchUser from "./pages/SearchUser";
 import UserDetail from "./pages/UserDetail";
@@ -144,6 +145,7 @@ function AppContent() {
       <main>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/login/callback" element={<LoginCallback />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/search" element={<SearchUser />} />
           <Route path="/user/:userId" element={<UserDetail />} />
