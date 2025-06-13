@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { requestAuthCode } from "../api/chzzk/auth";
 
 const Header = () => {
   const location = useLocation();
@@ -8,6 +9,26 @@ const Header = () => {
   const isSubtitlePage = location.pathname.startsWith("/subtitle");
   const isRandomBoxPage = location.pathname.startsWith("/random-box");
   const isClipPage = location.pathname.startsWith("/clip-generator");
+
+  const handleChzzkLogin = async () => {
+    try {
+      const clientId = import.meta.env.VITE_CHZZK_CLIENT_ID;
+      const redirectUri = `${window.location.origin}/login/callback`;
+      const state = crypto.randomUUID();
+
+      await requestAuthCode({
+        clientId,
+        redirectUri,
+        state,
+      });
+
+      window.location.href = `https://chzzk.naver.com/account-interlock?clientId=${clientId}&redirectUri=${encodeURIComponent(
+        redirectUri
+      )}&state=${state}`;
+    } catch (error) {
+      console.error("치지직 로그인 요청 실패:", error);
+    }
+  };
 
   return (
     <header>
@@ -39,6 +60,24 @@ const Header = () => {
               AI 클립생성기
             </Link>
           </div>
+          <button
+            onClick={handleChzzkLogin}
+            className="button button-primary"
+            style={{
+              marginLeft: "auto",
+              padding: "0.5rem 1rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+            }}
+          >
+            <img
+              src="/chzzklogo_kor(Black).png"
+              alt="치지직"
+              style={{ width: "80px", height: "24px" }}
+            />
+            <span>로그인</span>
+          </button>
         </div>
       </nav>
     </header>
