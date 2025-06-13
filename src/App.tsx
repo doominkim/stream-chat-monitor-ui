@@ -10,6 +10,7 @@ import { FaDesktop } from "react-icons/fa";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import Login from "./pages/Login";
 import LoginCallback from "./pages/LoginCallback";
+import LoginSuccess from "./pages/LoginSuccess";
 import Dashboard from "./pages/Dashboard";
 import SearchUser from "./pages/SearchUser";
 import UserDetail from "./pages/UserDetail";
@@ -144,16 +145,14 @@ function AppContent() {
       <Header />
       <main>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/login/callback" element={<LoginCallback />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={<Navigate to="/search" replace />} />
           <Route path="/search" element={<SearchUser />} />
           <Route path="/user/:userId" element={<UserDetail />} />
-          <Route path="/user/:userId/chat" element={<ChatHistory />} />
           <Route path="/subtitle" element={<Subtitle />} />
           <Route path="/random-box" element={<RandomBox />} />
           <Route path="/clip-generator" element={<ClipGenerator />} />
-          <Route path="/" element={<Navigate to="/subtitle" replace />} />
+          <Route path="/login/callback" element={<LoginCallback />} />
+          <Route path="/login/success" element={<LoginSuccess />} />
         </Routes>
       </main>
       <Footer>

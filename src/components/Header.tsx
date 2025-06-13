@@ -12,7 +12,7 @@ const Header = () => {
 
   const handleChzzkLogin = async () => {
     const clientId = import.meta.env.VITE_CHZZK_CLIENT_ID;
-    const redirectUri = "https://ping-pong.world/login/callback";
+    const redirectUri = "https://121.167.129.36:3000/auth/chzzk/callback";
     const state = `${Date.now()}_${Math.random().toString(36).slice(2)}`;
     localStorage.setItem("chzzk_oauth_state", state);
 
